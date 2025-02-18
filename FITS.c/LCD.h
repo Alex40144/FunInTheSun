@@ -1,0 +1,2 @@
+void setAlarm();
+void clearAlarm();

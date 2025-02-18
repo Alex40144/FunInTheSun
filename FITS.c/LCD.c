@@ -116,6 +116,7 @@
 //******************************************************************************
 #include <msp430.h>
 
+
 void showChar(char c, int position);
 void showCharB(char c, int position);
 #define pos1 4                                                 // Digit A1 - L4
@@ -124,6 +125,7 @@ void showCharB(char c, int position);
 #define pos4 10                                                // Digit A4 - L10
 #define pos5 2                                                 // Digit A5 - L2
 #define pos6 18                                                // Digit A6 - L18
+#define pos7 1                                                // Digit A6 - L18
 // Define word access definitions to LCD memories
 #define LCDMEMW ((int*)LCDMEM)
 #define LCDBMEMW ((int*)LCDBMEM)
@@ -181,48 +183,41 @@ const char alphabetBig[26][2] =
      {
          // Display space
          LCDMEMW[position/2] = 0;
-     }
-     else if (c >= '0' && c <= '9')
-     {
-         // Display digit
-         LCDMEMW[position/2] = digit[c-48][0] | (digit[c-48][1] << 8);
-     }
-     else if (c >= 'A' && c <= 'Z')
-     {
-         // Display alphabet
-         LCDMEMW[position/2] = alphabetBig[c-65][0] | (alphabetBig[c-65][1] << 8);
-     }
-     else
-     {
-         // Turn all segments on if character is not a space, digit, or uppercase letter
-         LCDMEMW[position/2] = 0xFFFF;
-     }
- }
-
- //Writes to screen 2
- void showCharB(char c, int position)
- {
-     if (c == ' ')
-     {
-         // Display space
          LCDBMEMW[position/2] = 0;
      }
      else if (c >= '0' && c <= '9')
      {
          // Display digit
+         LCDMEMW[position/2] = digit[c-48][0] | (digit[c-48][1] << 8);
          LCDBMEMW[position/2] = digit[c-48][0] | (digit[c-48][1] << 8);
      }
      else if (c >= 'A' && c <= 'Z')
      {
          // Display alphabet
+         LCDMEMW[position/2] = alphabetBig[c-65][0] | (alphabetBig[c-65][1] << 8);
          LCDBMEMW[position/2] = alphabetBig[c-65][0] | (alphabetBig[c-65][1] << 8);
      }
      else
      {
          // Turn all segments on if character is not a space, digit, or uppercase letter
+         LCDMEMW[position/2] = 0xFFFF;
          LCDBMEMW[position/2] = 0xFFFF;
      }
  }
+
+
+ void setAlarm(){
+    int position = 12;
+    LCDMEMW[position/2] |= 0x8;
+    LCDBMEMW[position/2] |= 0x8;
+ }
+
+  void clearAlarm(){
+    int position = 12;
+    LCDMEMW[position/2] &= ~0x8;
+    LCDBMEMW[position/2] &= ~0x8;
+ }
+
 
 int main( void )
 {
@@ -266,22 +261,15 @@ int main( void )
     LCDM0 = 0x21;                                              // L0 = COM0, L1 = COM1
     LCDM1 = 0x84;                                              // L2 = COM2, L3 = COM3
 
-
-    showChar('H', pos2);
-    showChar('E', pos3);
-    showChar('L', pos4);
-    showChar('L', pos5);
-    showChar('O', pos6);
+    showChar('0', pos1);
+    showChar('1', pos2);
+    showChar('2', pos3);
+    showChar('3', pos4);
+    showChar('4', pos5);
+    showChar('5', pos6);
 
     LCDBM0 = 0x21;
     LCDBM1 = 0x84;
-
-    showCharB('W', pos1);
-    showCharB('O', pos2);
-    showCharB('R', pos3);
-    showCharB('L', pos4);
-    showCharB('D', pos5);
-
 
     LCDBLKCTL = LCDBLKPRE__512 |                               //Divide xtclk by 512
             LCDBLKMOD_3;                                       //Switch between memory contents of LCDM and LCDB
@@ -291,8 +279,13 @@ int main( void )
     PMMCTL0_H = PMMPW_H;                                       // Open PMM Registers for write
     PMMCTL0_L |= PMMREGOFF_L;                                  // and set PMMREGOFF
 
+    setAlarm();
+    clearAlarm();
+    
     __bis_SR_register(LPM3_bits | GIE);                        // Enter LPM3
     __no_operation();                                          // For debugger
+
+
 }
 
 

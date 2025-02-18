@@ -1,0 +1,41 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "MSP430-Labs",
+            "type": "ccs-debug",
+            "request": "launch",
+            "projectInfo": {
+                "name": "MSP430-Labs",
+                "resourceId": "/MSP430-Labs"
+            }
+        },
+        {
+            "name": "Lab2",
+            "type": "ccs-debug",
+            "request": "launch",
+            "projectInfo": {
+                "name": "Lab2",
+                "resourceId": "/Lab2"
+            }
+        },
+        {
+            "name": "lab3",
+            "type": "ccs-debug",
+            "request": "launch",
+            "projectInfo": {
+                "name": "lab3",
+                "resourceId": "/lab3"
+            }
+        },
+        {
+            "name": "lab4",
+            "type": "ccs-debug",
+            "request": "launch",
+            "projectInfo": {
+                "name": "lab4",
+                "resourceId": "/lab4"
+            }
+        }
+    ]
+}

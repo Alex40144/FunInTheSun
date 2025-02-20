@@ -45,6 +45,15 @@
                 "name": "FITS.c",
                 "resourceId": "/FITS.c"
             }
+        },
+        {
+            "name": "LCD_HEADER",
+            "type": "ccs-debug",
+            "request": "launch",
+            "projectInfo": {
+                "name": "LCD_HEADER",
+                "resourceId": "/LCD_HEADER"
+            }
         }
     ]
 }

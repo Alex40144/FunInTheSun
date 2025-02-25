@@ -211,16 +211,28 @@ const char alphabetBig[26][2] =
 
  void setAlarm(){
     int position = 12;
-    LCDMEMW[position/2] |= 0x8;
-    LCDBMEMW[position/2] |= 0x8;
+    LCDMEMW[position/2] |= 0x2;
+    LCDBMEMW[position/2] |= 0x2;
  }
 
   void clearAlarm(){
     int position = 12;
-    LCDMEMW[position/2] &= ~0x8;
-    LCDBMEMW[position/2] &= ~0x8;
+    LCDMEMW[position/2] &= ~0x2;
+    LCDBMEMW[position/2] &= ~0x2;
+ }
+ void setChrono(){
+    LCDMEMW[4] |= 0x0400;//The main symbol
+    LCDBMEMW[4] |= 0x0400;
+    LCDMEMW[9] |= 0x0500;//The TX RX symbol
+    LCDBMEMW[9] |= 0x0500;
  }
 
+  void clearChrono(){
+    LCDMEMW[4] &= ~0x0400;
+    LCDBMEMW[4] &= ~0x0400;
+    LCDMEMW[9] &= ~0x0500;
+    LCDBMEMW[9] &= ~0x0500;
+ }
 
 void LCD_INIT( void )
 {

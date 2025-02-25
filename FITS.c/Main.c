@@ -224,7 +224,9 @@ int main(void)
 
     LCD_INIT();
     setAlarm();
+    setChrono();
     clearAlarm();
+    clearChrono();
     LCD_WriteAll('1','2','D','Z','A','9');
     LCD_WriteSingle('F', 3);
 

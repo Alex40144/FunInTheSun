@@ -212,12 +212,24 @@ int main(void)
     P1OUT &= ~0x01;                 // Set P1.0 off (Green LED)
     P4OUT &= ~0x01;                 // Set P4.6 off (Red LED)
 
+  // set SW1 as GPIO input with pullup
+    #define SW1 2
+    P1SEL0 &= ~(1<<SW1);
+    P1OUT |= (1<<SW1);
+    P1REN |= (1<<SW1);
+    P1DIR &= ~(1<<SW1);
+
+    P1IE  |= 0x04;  // Enable interrupt on P1.2
+    P1IES |= 0x04;  // Set P1.2 button interrupt to be a high-to-low tranisition
+    P1IFG &= ~0x04; // Clear local interrupt flag for P1.2
+    
+
     //P4OUT |=  0x40;               // Set P4.6 on  (Red LED)
 
 
                                     // Timer A0 (1ms interrupt)
     TA0CCR0 =  1024;                // Count up to 1024
-    TA0CCTL0 = 0x10;                // Enable counter interrupts, bit 4=1
+    //TA0CCTL0 = 0x10;                // Enable counter interrupts, bit 4=1
     TA0CTL =  TASSEL_2 + MC_1;      // Timer A using subsystem master clock, SMCLK(1.1 MHz)
                                     // and count UP to create a 1ms interrupt
 
@@ -230,8 +242,6 @@ int main(void)
 
 
     // Initialisation - Software
-
-    _BIS_SR(GIE);                   // interrupts enabled (we need to do it here so it gets saved to stack)
 
     initialise_process(0, chrono);
     initialise_process(1, clock);
@@ -271,51 +281,54 @@ int main(void)
               [7]   get context from stack
 
 *F ---------------------------------------------------------------------------*/
-#pragma vector=TIMER0_A0_VECTOR
-__interrupt void Timer0_A0 (void)    // Timer0 A0 1ms interrupt service routine
+#pragma vector=PORT1_VECTOR
+__interrupt void Port_1 (void)
 {
+
     // Save first process details...
+        P1OUT ^= 0x01;                 // Set P1.0 toggle (Green LED)
 
-    asm(
 
-            " push.a R15\n"
-            " push.a R14\n"
-            " push.a R13\n"
-            " push.a R12\n"
-            " push.a R11\n"
-            " push.a R10\n"
-            " push.a R9\n"
-            " push.a R8\n"
-            " push.a R7\n"
-            " push.a R6\n"
-            " push.a R5\n"
-            " push.a R4\n"
-            " push.a R3\n"
-            " movx.a sp,&stack_pointer\n"
-        );
+    // asm(
 
-    process[current_process].sp = stack_pointer;
+    //         " push.a R15\n"
+    //         " push.a R14\n"
+    //         " push.a R13\n"
+    //         " push.a R12\n"
+    //         " push.a R11\n"
+    //         " push.a R10\n"
+    //         " push.a R9\n"
+    //         " push.a R8\n"
+    //         " push.a R7\n"
+    //         " push.a R6\n"
+    //         " push.a R5\n"
+    //         " push.a R4\n"
+    //         " push.a R3\n"
+    //         " movx.a sp,&stack_pointer\n"
+    //     );
 
-    current_process = (current_process+1) % MAX_PROCESSES;
+    // process[current_process].sp = stack_pointer;
 
-    stack_pointer = process[current_process].sp;
+    // current_process = (current_process+1) % MAX_PROCESSES;
 
-    asm(
-            " movx.a &stack_pointer,SP \n"
-            " pop.a R3 \n"
-            " pop.a R4 \n"
-            " pop.a R5 \n"
-            " pop.a R6 \n"
-            " pop.a R7 \n"
-            " pop.a R8 \n"
-            " pop.a R9 \n"
-            " pop.a R10 \n"
-            " pop.a R11 \n"
-            " pop.a R12 \n"
-            " pop.a R13 \n"
-            " pop.a R14 \n"
-            " pop.a R15 \n"
+    // stack_pointer = process[current_process].sp;
+
+    // asm(
+    //         " movx.a &stack_pointer,SP \n"
+    //         " pop.a R3 \n"
+    //         " pop.a R4 \n"
+    //         " pop.a R5 \n"
+    //         " pop.a R6 \n"
+    //         " pop.a R7 \n"
+    //         " pop.a R8 \n"
+    //         " pop.a R9 \n"
+    //         " pop.a R10 \n"
+    //         " pop.a R11 \n"
+    //         " pop.a R12 \n"
+    //         " pop.a R13 \n"
+    //         " pop.a R14 \n"
+    //         " pop.a R15 \n"
             
 
-    );
+    // );
 }

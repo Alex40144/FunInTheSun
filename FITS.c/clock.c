@@ -1,0 +1,3 @@
+void clock () {
+    //do something
+}

@@ -174,7 +174,6 @@ void run_process(unsigned int process_index)
 
 
 
-
 /*F ----------------------------------------------------------------------------
   NAME :      main()
 
@@ -240,6 +239,7 @@ int main(void)
     LCD_WriteAll('1','2','D','Z','A','9');
     LCD_WriteSingle('F', 3);
 
+    _BIS_SR(GIE);                   // interrupts enabled
 
     // Initialisation - Software
 
@@ -252,7 +252,6 @@ int main(void)
 
 
 
-    _BIS_SR(GIE);                   // interrupts enabled
 
     for (;;)
     {
@@ -286,49 +285,38 @@ __interrupt void Port_1 (void)
 {
 
     // Save first process details...
-        P1OUT ^= 0x01;                 // Set P1.0 toggle (Green LED)
+    P1OUT ^= 0x01;                 // Set P1.0 toggle (Green LED)
+    P1IFG &= ~0x04; // Clear local interrupt flag for P1.2
 
 
-    // asm(
+    asm(
+            " push.a R10\n"
+            " push.a R9\n"
+            " push.a R8\n"
+            " push.a R7\n"
+            " push.a R6\n"
+            " push.a R5\n"
+            " push.a R4\n"
+            " push.a R3\n"
+            " movx.a sp,&stack_pointer\n"
+        );
 
-    //         " push.a R15\n"
-    //         " push.a R14\n"
-    //         " push.a R13\n"
-    //         " push.a R12\n"
-    //         " push.a R11\n"
-    //         " push.a R10\n"
-    //         " push.a R9\n"
-    //         " push.a R8\n"
-    //         " push.a R7\n"
-    //         " push.a R6\n"
-    //         " push.a R5\n"
-    //         " push.a R4\n"
-    //         " push.a R3\n"
-    //         " movx.a sp,&stack_pointer\n"
-    //     );
+    process[current_process].sp = stack_pointer;
 
-    // process[current_process].sp = stack_pointer;
+    current_process = (current_process+1) % MAX_PROCESSES;
 
-    // current_process = (current_process+1) % MAX_PROCESSES;
+    stack_pointer = process[current_process].sp;
 
-    // stack_pointer = process[current_process].sp;
+    asm(
+            " movx.a &stack_pointer,SP \n"
+            " pop.a R3 \n"
+            " pop.a R4 \n"
+            " pop.a R5 \n"
+            " pop.a R6 \n"
+            " pop.a R7 \n"
+            " pop.a R8 \n"
+            " pop.a R9 \n"
+            " pop.a R10 \n"
 
-    // asm(
-    //         " movx.a &stack_pointer,SP \n"
-    //         " pop.a R3 \n"
-    //         " pop.a R4 \n"
-    //         " pop.a R5 \n"
-    //         " pop.a R6 \n"
-    //         " pop.a R7 \n"
-    //         " pop.a R8 \n"
-    //         " pop.a R9 \n"
-    //         " pop.a R10 \n"
-    //         " pop.a R11 \n"
-    //         " pop.a R12 \n"
-    //         " pop.a R13 \n"
-    //         " pop.a R14 \n"
-    //         " pop.a R15 \n"
-            
-
-    // );
+    );
 }

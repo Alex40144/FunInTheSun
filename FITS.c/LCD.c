@@ -126,6 +126,9 @@ void showCharB(char c, int position);
 #define pos5 2                                                 // Digit A5 - L2
 #define pos6 18                                                // Digit A6 - L18
 #define pos7 1                                                // Digit A6 - L18
+
+int posLookUp[] = {4,6,8,10,2,18,1};
+
 // Define word access definitions to LCD memories
 #define LCDMEMW ((int*)LCDMEM)
 #define LCDBMEMW ((int*)LCDBMEM)
@@ -281,4 +284,17 @@ void LCD_INIT( void )
 
 }
 
+void LCD_WriteAll(char text1, char text2, char text3, char text4, char text5, char text6 ){
+    showChar(text1, pos1);
+    showChar(text2, pos2);
+    showChar(text3, pos3);
+    showChar(text4, pos4);
+    showChar(text5, pos5);
+    showChar(text6, pos6);
+}
 
+void LCD_WriteSingle(char text, int position){
+    position = posLookUp[position-1];
+    showChar(text, position);
+
+}

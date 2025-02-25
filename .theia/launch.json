@@ -36,6 +36,15 @@
                 "name": "lab4",
                 "resourceId": "/lab4"
             }
+        },
+        {
+            "name": "FITS.c",
+            "type": "ccs-debug",
+            "request": "launch",
+            "projectInfo": {
+                "name": "FITS.c",
+                "resourceId": "/FITS.c"
+            }
         }
     ]
 }

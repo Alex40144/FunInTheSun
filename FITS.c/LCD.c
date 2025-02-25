@@ -219,7 +219,7 @@ const char alphabetBig[26][2] =
  }
 
 
-int main( void )
+void LCD_INIT( void )
 {
     WDTCTL = WDTPW | WDTHOLD;                                  // Stop watchdog timer
 
@@ -261,7 +261,7 @@ int main( void )
     LCDM0 = 0x21;                                              // L0 = COM0, L1 = COM1
     LCDM1 = 0x84;                                              // L2 = COM2, L3 = COM3
 
-    showChar('0', pos1);
+    showChar('7', pos1);
     showChar('1', pos2);
     showChar('2', pos3);
     showChar('3', pos4);
@@ -278,13 +278,6 @@ int main( void )
 
     PMMCTL0_H = PMMPW_H;                                       // Open PMM Registers for write
     PMMCTL0_L |= PMMREGOFF_L;                                  // and set PMMREGOFF
-
-    setAlarm();
-    clearAlarm();
-    
-    __bis_SR_register(LPM3_bits | GIE);                        // Enter LPM3
-    __no_operation();                                          // For debugger
-
 
 }
 

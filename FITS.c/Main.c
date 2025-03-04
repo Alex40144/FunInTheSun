@@ -223,6 +223,13 @@ int main(void)
     P1IE  |= 0x04;  // Enable interrupt on P1.2
     P1IES |= 0x04;  // Set P1.2 button interrupt to be a high-to-low tranisition
     P1IFG &= ~0x04; // Clear local interrupt flag for P1.2
+
+     // set SW2 (P2.6) as GPIO input with pullup
+    #define SW2 6
+    P2SEL0 &= ~(1<<SW2);
+    P2OUT |= (1<<SW2);
+    P2REN |= (1<<SW2);
+    P2DIR &= ~(1<<SW2);
     
 
     //P4OUT |=  0x40;               // Set P4.6 on  (Red LED)

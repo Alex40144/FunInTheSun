@@ -12,6 +12,9 @@
 #define WORD unsigned short
 #define BYTE unsigned char
 
+//Hour, Min, Weekday, Date(Day), Monrth
+//Weekdays0 = Monday, 6 = Sunday
+int currentDayTime[] = {1,11,0,0,0};
 
 
 /*F ----------------------------------------------------------------------------

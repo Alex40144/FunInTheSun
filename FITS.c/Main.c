@@ -219,19 +219,19 @@ int main(void)
     P1REN |= (1<<SW1);
     P1DIR &= ~(1<<SW1);
 
+    #define SW2 6
+    P2SEL0 &= ~(1<<SW2);
+    P2OUT |= (1<<SW2);
+    P2REN |= (1<<SW2);
+    P2DIR &= ~(1<<SW2);
+
     P1IE  |= 0x04;  // Enable interrupt on P1.2
     P1IES |= 0x04;  // Set P1.2 button interrupt to be a high-to-low tranisition
     P1IFG &= ~0x04; // Clear local interrupt flag for P1.2
     
 
-    //P4OUT |=  0x40;               // Set P4.6 on  (Red LED)
-
-
-                                    // Timer A0 (1ms interrupt)
-    TA0CCR0 =  1024;                // Count up to 1024
-    //TA0CCTL0 = 0x10;                // Enable counter interrupts, bit 4=1
-    TA0CTL =  TASSEL_2 + MC_1;      // Timer A using subsystem master clock, SMCLK(1.1 MHz)
-                                    // and count UP to create a 1ms interrupt
+	TA0CCTL1 = CAP + CM_0 + SCS + CCIS_0;
+	TA0CTL |= TASSEL_2 + MC_2 + TACLR;
 
 
     LCD_INIT();

@@ -237,8 +237,8 @@ int main(void)
     LCD_INIT();
     setAlarm();
     clearAlarm();
-    LCD_WriteAll('1','2','D','Z','A','9');
-    LCD_WriteSingle('F', 3);
+    LCD_WriteAll('1','2','D','Z','A');
+    LCD_WriteSingle('F', 6);
 
     _BIS_SR(GIE);                   // interrupts enabled
 
@@ -285,13 +285,13 @@ int main(void)
 __interrupt void Port_1 (void)
 {
     __disable_interrupt();
-    __delay_cycles(10000);
+    __delay_cycles(20000);
 
     if (!(P1IN & BIT2)) { // Check again if switch is still pressed
             // Save first process details...
       P1OUT ^= 0x01;                 // Set P1.0 toggle (Green LED)
-      P1IFG &= ~0x04; // Clear local interrupt flag for P1.2
-     /* asm(
+
+     asm(
               " push.a R10\n"
               " push.a R9\n"
               " push.a R8\n"
@@ -320,8 +320,9 @@ __interrupt void Port_1 (void)
               " pop.a R9 \n"
               " pop.a R10 \n"
 
-      );*/
+      );
     }
+    P1IFG &= ~0x04; // Clear local interrupt flag for P1.2
     _BIS_SR(GIE);                   // interrupts enabled
 
 }

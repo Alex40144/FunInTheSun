@@ -264,13 +264,6 @@ void LCD_INIT( void )
     LCDM0 = 0x21;                                              // L0 = COM0, L1 = COM1
     LCDM1 = 0x84;                                              // L2 = COM2, L3 = COM3
 
-    showChar('7', pos1);
-    showChar('1', pos2);
-    showChar('2', pos3);
-    showChar('3', pos4);
-    showChar('4', pos5);
-    showChar('5', pos6);
-
     LCDBM0 = 0x21;
     LCDBM1 = 0x84;
 
@@ -284,13 +277,12 @@ void LCD_INIT( void )
 
 }
 
-void LCD_WriteAll(char text1, char text2, char text3, char text4, char text5, char text6 ){
+void LCD_WriteAll(char text1, char text2, char text3, char text4, char text5){
     showChar(text1, pos1);
     showChar(text2, pos2);
     showChar(text3, pos3);
     showChar(text4, pos4);
     showChar(text5, pos5);
-    showChar(text6, pos6);
 }
 
 void LCD_WriteSingle(char text, int position){

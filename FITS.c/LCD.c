@@ -209,28 +209,100 @@ const char alphabetBig[26][2] =
  }
 
 
- void setAlarm(){
+ void LCD_setAlarm(){
     int position = 12;
     LCDMEMW[position/2] |= 0x2;
     LCDBMEMW[position/2] |= 0x2;
  }
 
-  void clearAlarm(){
+  void LCD_clearAlarm(){
     int position = 12;
     LCDMEMW[position/2] &= ~0x2;
     LCDBMEMW[position/2] &= ~0x2;
  }
 
-  void setStopWatch(){
+  void LCD_setStopWatch(){
     int position = 12;
     LCDMEMW[position/2] |= 0x8;
     LCDBMEMW[position/2] |= 0x8;
  }
 
-  void clearStopWatch(){
+  void LCD_clearStopWatch(){
     int position = 12;
     LCDMEMW[position/2] &= ~0x08;
     LCDBMEMW[position/2] &= ~0x08;
+ }
+
+  void LCD_setChrono(){
+    LCDMEMW[4] |= 0x0400;//The main symbol
+    LCDBMEMW[4] |= 0x0400;
+    LCDMEMW[9] |= 0x0500;//The TX RX symbol
+    LCDBMEMW[9] |= 0x0500;
+ }
+
+  void LCD_clearChrono(){
+    LCDMEMW[4] &= ~0x0400;
+    LCDBMEMW[4] &= ~0x0400;
+    LCDMEMW[9] &= ~0x0500;
+    LCDBMEMW[9] &= ~0x0500;
+ }
+
+   void LCD_setColon(){
+    LCDMEMW[3] |= 0x0400;//The main symbol
+    LCDBMEMW[3] |= 0x0400;
+
+ }
+
+  void LCD_clearColon(){
+    LCDMEMW[3] &= ~0x0400;
+    LCDBMEMW[3] &= ~0x0400;
+ }
+
+   void LCD_setDecimalOne(){
+    LCDMEMW[3] |= 0x0100;//The main symbol
+    LCDBMEMW[3] |= 0x0100;
+
+ }
+
+  void LCD_clearDecimalOne(){
+    LCDMEMW[3] &= ~0x0100;
+    LCDBMEMW[3] &= ~0x0100;
+ }
+
+    void LCD_setDecimalTwo(){
+    LCDMEMW[5] |= 0x0100;//The main symbol
+    LCDBMEMW[5] |= 0x0100;
+
+ }
+
+  void LCD_clearDecimalTwo(){
+    LCDMEMW[5] &= ~0x0100;
+    LCDBMEMW[5] &= ~0x0100;
+ }
+ 
+ void LCD_setDecimals(){
+    LCDMEMW[5] |= 0x0100;//The main symbol
+    LCDBMEMW[5] |= 0x0100;
+    LCDMEMW[3] |= 0x0100;//The main symbol
+    LCDBMEMW[3] |= 0x0100;
+
+ }
+
+  void LCD_clearDecimals(){
+    LCDMEMW[5] &= ~0x0100;
+    LCDBMEMW[5] &= ~0x0100;
+    LCDMEMW[3] &= ~0x0100;
+    LCDBMEMW[3] &= ~0x0100;
+ }
+
+   void test(){
+    int i = 0;
+    for(i;i<40;i++){
+        int j = 0;
+        for(j;j<30000;j++){}
+        LCDMEMW[i] |= 0xFFFF;
+        LCDBMEMW[i] |= 0xFFFF;
+    }
  }
 
 

@@ -235,10 +235,6 @@ int main(void)
 
 
     LCD_INIT();
-    setAlarm();
-    clearAlarm();
-    setStopWatch();
-    clearStopWatch();
     LCD_WriteAll('1','2','D','Z','A');
     LCD_WriteSingle('F', 6);
 

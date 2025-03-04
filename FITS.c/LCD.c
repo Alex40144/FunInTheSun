@@ -211,14 +211,26 @@ const char alphabetBig[26][2] =
 
  void setAlarm(){
     int position = 12;
-    LCDMEMW[position/2] |= 0x8;
-    LCDBMEMW[position/2] |= 0x8;
+    LCDMEMW[position/2] |= 0x2;
+    LCDBMEMW[position/2] |= 0x2;
  }
 
   void clearAlarm(){
     int position = 12;
-    LCDMEMW[position/2] &= ~0x8;
-    LCDBMEMW[position/2] &= ~0x8;
+    LCDMEMW[position/2] &= ~0x2;
+    LCDBMEMW[position/2] &= ~0x2;
+ }
+
+  void setStopWatch(){
+    int position = 12;
+    LCDMEMW[position/2] |= 0x8;
+    LCDBMEMW[position/2] |= 0x8;
+ }
+
+  void clearStopWatch(){
+    int position = 12;
+    LCDMEMW[position/2] &= ~0x08;
+    LCDBMEMW[position/2] &= ~0x08;
  }
 
 

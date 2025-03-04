@@ -1,15 +1,25 @@
+#include "LCD.h"
+
+#define IDLE 0
+#define START 0
+
+
 void chrono () {
-    //do something
-    while(1){
-        int i = 0;
-    for(i;i<30000;i++){
-        if(i==29999){
-                LCD_WriteAll('C', 'H', 'R', 'O', 'N');
-                LCD_WriteSingle('O', 6);
-                i = 0;
+    //turn on symbol to show mode
+    //display 0
+    LCD_WriteAll('0','0','0','0','0');
+    LCD_WriteSingle('0', 6)
+
+    int state = 0
+    
+    //when start is pressed, 
+
+    while (1){
+        switch (state) {
+            IDLE:
+                //if button pressed move to start state
+            break;
         }
     }
-
-
-    }
+    
 }

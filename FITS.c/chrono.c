@@ -1,5 +1,9 @@
+#include <msp430.h>
 void chrono () {
+    _BIS_SR(GIE);                   // interrupts enabled
     //do something
-    LCD_WriteAll('C','H','R','O','N','O');
+    int i = 0;
+    i++;
+
     
 }

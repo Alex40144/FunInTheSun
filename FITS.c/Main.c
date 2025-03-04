@@ -243,12 +243,12 @@ int main(void)
 
     // Initialisation - Software
 
-    /*initialise_process(0, chrono);
+    initialise_process(0, chrono);
     initialise_process(1, clock);
     initialise_process(2, time);
 
 
-    run_process(current_process);*/
+    run_process(current_process);
 
 
 
@@ -264,8 +264,6 @@ int main(void)
 #pragma vector=PORT1_VECTOR
 __interrupt void Port_1 (void)
 {
-
-    // Save first process details...
-        P1OUT ^= 0x01;                 // Set P1.0 toggle (Green LED)
-        P1IFG &= ~BIT2;  // Clear P1.1 interrupt flag
+        P1OUT ^= 0x01;      // Toggle P1.0 (Green LED)
+        P1IFG &= ~BIT2;     // Clear P1.1 interrupt flag
 }

@@ -285,7 +285,7 @@ int main(void)
 __interrupt void Port_1 (void)
 {
     __disable_interrupt();
-    __delay_cycles(20000);
+    __delay_cycles(40000);
 
     if (!(P1IN & BIT2)) { // Check again if switch is still pressed
             // Save first process details...

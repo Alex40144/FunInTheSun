@@ -194,6 +194,12 @@ const char alphabetBig[26][2] =
          LCDMEMW[position/2] = digit[c-48][0] | (digit[c-48][1] << 8);
          LCDBMEMW[position/2] = digit[c-48][0] | (digit[c-48][1] << 8);
      }
+    else if (c >= 0 && c <= 9)
+     {
+         // Display digit
+         LCDMEMW[position/2] = digit[c][0] | (digit[c][1] << 8);
+         LCDBMEMW[position/2] = digit[c][0] | (digit[c][1] << 8);
+     }
      else if (c >= 'A' && c <= 'Z')
      {
          // Display alphabet
@@ -295,6 +301,25 @@ const char alphabetBig[26][2] =
     LCDBMEMW[3] &= ~0x0100;
  }
 
+ void LCD_ClearNums(){
+  showChar(' ', pos1);
+  showChar(' ', pos2);
+  showChar(' ', pos3);
+  showChar(' ', pos4);
+  showChar(' ', pos5);
+  showChar(' ', pos6);
+ }
+
+ void LCD_setBlink(int position){
+    position = posLookUp[position-1];
+    LCDBMEMW[position/2] = 0;
+ }
+
+void LCD_clearBlink(int position){
+    position = posLookUp[position-1];
+    LCDBMEMW[position/2] = LCDMEMW[position/2];
+ }
+
    void test(){
     int i = 0;
     for(i;i<40;i++){
@@ -351,7 +376,7 @@ void LCD_INIT( void )
     LCDBM0 = 0x21;
     LCDBM1 = 0x84;
 
-    LCDBLKCTL = LCDBLKPRE__512 |                               //Divide xtclk by 512
+    LCDBLKCTL = LCDBLKPRE__128 |                               //Divide xtclk by 512
             LCDBLKMOD_3;                                       //Switch between memory contents of LCDM and LCDB
 
     LCDCTL0 |= LCD4MUX | LCDON;                                // Turn on LCD, 4-mux selected

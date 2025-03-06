@@ -1,6 +1,9 @@
 //Hour, Min, Weekday, Date(Day), Monrth
 //Weekdays0 = Monday, 6 = Sunday
-int currentDayTime[] = {1,11,0,0,0};
+
+
+int currentDayTime[] = {1,11,3,15,9};
+
 int setLCDHours(){
     LCD_ClearNums();
     int hours = currentDayTime[0];
@@ -18,17 +21,76 @@ int setLCDMins(){
     LCD_WriteSingle(minDigitTwo,4);
 }
 
+int setLCDDotW(){
+    switch(currentDayTime[2]){
+        case 0:
+            LCD_WriteSingle('M',5);
+            LCD_WriteSingle('O',6);
+            break;
+        case 1:
+            LCD_WriteSingle('T',5);
+            LCD_WriteSingle('U',6);
+            break;
+        case 2:
+            LCD_WriteSingle('W',5);
+            LCD_WriteSingle('E',6);
+            break;
+        case 3:
+            LCD_WriteSingle('T',5);
+            LCD_WriteSingle('H',6);
+            break;
+        case 4:
+            LCD_WriteSingle('F',5);
+            LCD_WriteSingle('R',6);
+            break;
+        case 5:
+            LCD_WriteSingle('S',5);
+            LCD_WriteSingle('A',6);
+            break;
+        case 6:
+            LCD_WriteSingle('S',5);
+            LCD_WriteSingle('U',6);
+            break;
+        default:
+            LCD_WriteSingle('X',5);
+            LCD_WriteSingle('X',6);
+            break;
+    }
+}
+
+int setLCDDate(){
+    int Date = currentDayTime[3];
+    int dateDigitOne = Date / 10;
+    int dateDigitTwo = Date % 10;
+    LCD_WriteSingle(dateDigitOne,1);
+    LCD_WriteSingle(dateDigitTwo,2);
+}
+
+int setLCDMonth(){
+    int Month = currentDayTime[4];
+    int monthDigitOne = Month / 10;
+    int monthDigitTwo = Month % 10;
+    LCD_WriteSingle(monthDigitOne,3);
+    LCD_WriteSingle(monthDigitTwo,4);
+}
+
 
 void time () {
     //do something
     while(1){
         int i =0;
             for(i;i<30000;i++){
-        if(i==29999){
+        if(i==15000){
                 setLCDHours();
                 setLCDMins();
+                setLCDDotW();
                 LCD_setColon();
-                LCD_WriteSingle(' ', 6);
+                //test();
+
+        }else if(i==29999){
+                setLCDDate();
+                setLCDMonth();
+                LCD_setDecimals();
                 i = 0;
         }
     }

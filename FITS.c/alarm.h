@@ -1,2 +1,3 @@
+
 #include "LCD.h"
-void chrono();
+void alarm();

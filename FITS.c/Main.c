@@ -213,7 +213,7 @@ int main(void)
     P1OUT &= ~0x01;                 // Set P1.0 off (Green LED)
     P4OUT &= ~0x01;                 // Set P4.6 off (Red LED)
 
-  // set SW1 as GPIO input with pullup
+  // set SW1 as GPIO input with pullup // MODE button of system
     #define SW1 2
     P1SEL0 &= ~(1<<SW1);
     P1OUT |= (1<<SW1);
@@ -225,11 +225,21 @@ int main(void)
     P1IFG &= ~0x04; // Clear local interrupt flag for P1.2
 
      // set SW2 (P2.6) as GPIO input with pullup
-    #define SW2 6
+    #define SW2 6 // SW2 as LAP/RESET button of system
     P2SEL0 &= ~(1<<SW2);
     P2OUT |= (1<<SW2);
     P2REN |= (1<<SW2);
     P2DIR &= ~(1<<SW2);
+
+    // set SW3 as P1.4 (input with pull up) and P1.5 (output set LOW) for START/STOP button of system (use jumper wire)
+    #define SW3 4 // SW3 as START/STOP button of system
+    P1SEL0 &= ~(1<<SW3);
+    P1OUT |= (1<<SW3);
+    P1REN |= (1<<SW3);
+    P1DIR &= ~(1<<SW3);   
+    #define SW3OUTPUT 5
+    P1DIR |=  (1<<SW3OUTPUT);  // Set to output direction
+    P1OUT &= ~(1<<SW3OUTPUT);  // Set low (for SW3)
     
 
     //P4OUT |=  0x40;               // Set P4.6 on  (Red LED)

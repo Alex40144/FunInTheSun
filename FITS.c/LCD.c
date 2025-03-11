@@ -293,7 +293,6 @@ void LCD_INIT( void )
 
     PMMCTL0_H = PMMPW_H;                                       // Open PMM Registers for write
     PMMCTL0_L |= PMMREGOFF_L;                                  // and set PMMREGOFF
-
 }
 
 void LCD_WriteAll(char text1, char text2, char text3, char text4, char text5, char text6 ){

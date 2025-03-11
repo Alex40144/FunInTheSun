@@ -1,8 +1,11 @@
 //Hour, Min, Weekday, Date(Day), Monrth
 //Weekdays0 = Monday, 6 = Sunday
-
+#include <stdio.h>
 
 int currentDayTime[] = {1,11,3,15,9};
+
+enum States{STATE_MINS,STATE_HOURS,STATE_DOTW,STATE_DATE,STATE_MONTH}Current_State;
+
 
 int setLCDHours(){
     LCD_ClearNums();
@@ -76,8 +79,24 @@ int setLCDMonth(){
 
 
 void time () {
+    Current_State = STATE_MINS;
     //do something
     while(1){
+        switch (Current_State) {
+        case STATE_MINS:
+            break;
+        case STATE_HOURS:
+            break;
+        case STATE_DOTW:
+            break;
+        case STATE_DATE:
+            break;
+        case STATE_MONTH:
+            break;
+        default:
+            break;
+        }
+
         int i =0;
             for(i;i<30000;i++){
         if(i==15000){

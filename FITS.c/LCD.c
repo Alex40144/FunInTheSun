@@ -179,6 +179,37 @@ const char alphabetBig[26][2] =
     {0x90, 0x28}   /* "Z" */
 };
 
+//Small alphabet
+const char alphabetSmall[26][2] =
+{
+    {0xFB, 0x00},  /* "a" */
+    {0x0F, 0x22},  /* "b" */
+    {0x1B, 0x00},  /* "c" */
+    {0x3D, 0x00},  /* "d" */
+    {0x9F, 0x00},  /* "e" */
+    {0x87, 0x00},  /* "f" */
+    {0xBD, 0x00},  /* "g" */
+    {0x0E, 0x02},  /* "h" */
+    {0x10, 0x00},  /* "i" */
+    {0x78, 0x00},  /* "j" */
+    {0x0E, 0x22},  /* "k" */
+    {0x1C, 0x00},  /* "l" */
+    {0x6C, 0xA0},  /* "m" */
+    {0x0C, 0x02},  /* "n" */
+    {0x1F, 0x00},  /* "o" */
+    {0x8F, 0x00},  /* "p" */
+    {0xFC, 0x02},  /* "q" */
+    {0x0C, 0x02},  /* "r" */
+    {0xB7, 0x00},  /* "s" */
+    {0x80, 0x50},  /* "t" */
+    {0x3C, 0x00},  /* "u" */
+    {0x0C, 0x28},  /* "v" */
+    {0x6C, 0x0A},  /* "w" */
+    {0x00, 0xAA},  /* "x" */
+    {0x00, 0xB0},  /* "y" */
+    {0x90, 0x28}   /* "z" */
+};
+
 //Writes to screen 1
  void showChar(char c, int position)
  {
@@ -194,11 +225,23 @@ const char alphabetBig[26][2] =
          LCDMEMW[position/2] = digit[c-48][0] | (digit[c-48][1] << 8);
          LCDBMEMW[position/2] = digit[c-48][0] | (digit[c-48][1] << 8);
      }
+    else if (c >= 0 && c <= 9)
+     {
+         // Display digit
+         LCDMEMW[position/2] = digit[c][0] | (digit[c][1] << 8);
+         LCDBMEMW[position/2] = digit[c][0] | (digit[c][1] << 8);
+     }
      else if (c >= 'A' && c <= 'Z')
      {
          // Display alphabet
          LCDMEMW[position/2] = alphabetBig[c-65][0] | (alphabetBig[c-65][1] << 8);
          LCDBMEMW[position/2] = alphabetBig[c-65][0] | (alphabetBig[c-65][1] << 8);
+     }
+     else if (c >= 'a' && c <= 'z')
+     {
+         // Display alphabet
+         LCDMEMW[position/2] = alphabetSmall[c-97][0] | (alphabetSmall[c-97][1] << 8);
+         LCDBMEMW[position/2] = alphabetSmall[c-97][0] | (alphabetSmall[c-97][1] << 8);
      }
      else
      {
@@ -209,16 +252,119 @@ const char alphabetBig[26][2] =
  }
 
 
- void setAlarm(){
+ void LCD_setAlarm(){
+    int position = 12;
+    LCDMEMW[position/2] |= 0x2;
+    LCDBMEMW[position/2] |= 0x2;
+ }
+
+  void LCD_clearAlarm(){
+    int position = 12;
+    LCDMEMW[position/2] &= ~0x2;
+    LCDBMEMW[position/2] &= ~0x2;
+ }
+
+  void LCD_setStopWatch(){
     int position = 12;
     LCDMEMW[position/2] |= 0x8;
     LCDBMEMW[position/2] |= 0x8;
  }
 
-  void clearAlarm(){
+  void LCD_clearStopWatch(){
     int position = 12;
-    LCDMEMW[position/2] &= ~0x8;
-    LCDBMEMW[position/2] &= ~0x8;
+    LCDMEMW[position/2] &= ~0x08;
+    LCDBMEMW[position/2] &= ~0x08;
+ }
+
+  void LCD_setChrono(){
+    LCDMEMW[4] |= 0x0400;//The main symbol
+    LCDBMEMW[4] |= 0x0400;
+    LCDMEMW[9] |= 0x0500;//The TX RX symbol
+    LCDBMEMW[9] |= 0x0500;
+ }
+
+  void LCD_clearChrono(){
+    LCDMEMW[4] &= ~0x0400;
+    LCDBMEMW[4] &= ~0x0400;
+    LCDMEMW[9] &= ~0x0500;
+    LCDBMEMW[9] &= ~0x0500;
+ }
+
+   void LCD_setColon(){
+    LCDMEMW[3] |= 0x0400;//The main symbol
+    LCDBMEMW[3] |= 0x0400;
+
+ }
+
+  void LCD_clearColon(){
+    LCDMEMW[3] &= ~0x0400;
+    LCDBMEMW[3] &= ~0x0400;
+ }
+
+   void LCD_setDecimalOne(){
+    LCDMEMW[3] |= 0x0100;//The main symbol
+    LCDBMEMW[3] |= 0x0100;
+
+ }
+
+  void LCD_clearDecimalOne(){
+    LCDMEMW[3] &= ~0x0100;
+    LCDBMEMW[3] &= ~0x0100;
+ }
+
+    void LCD_setDecimalTwo(){
+    LCDMEMW[5] |= 0x0100;//The main symbol
+    LCDBMEMW[5] |= 0x0100;
+
+ }
+
+  void LCD_clearDecimalTwo(){
+    LCDMEMW[5] &= ~0x0100;
+    LCDBMEMW[5] &= ~0x0100;
+ }
+ 
+ void LCD_setDecimals(){
+    LCDMEMW[5] |= 0x0100;//The main symbol
+    LCDBMEMW[5] |= 0x0100;
+    LCDMEMW[3] |= 0x0100;//The main symbol
+    LCDBMEMW[3] |= 0x0100;
+
+ }
+
+  void LCD_clearDecimals(){
+    LCDMEMW[5] &= ~0x0100;
+    LCDBMEMW[5] &= ~0x0100;
+    LCDMEMW[3] &= ~0x0100;
+    LCDBMEMW[3] &= ~0x0100;
+ }
+
+ void LCD_ClearNums(){
+  showChar(' ', pos1);
+  showChar(' ', pos2);
+  showChar(' ', pos3);
+  showChar(' ', pos4);
+  showChar(' ', pos5);
+  showChar(' ', pos6);
+ }
+
+ void LCD_setBlink(int position){
+    position = posLookUp[position-1];
+    LCDBMEMW[position/2] = 0;
+ }
+
+void LCD_clearBlink(int position){
+    position = posLookUp[position-1];
+    LCDBMEMW[position/2] = LCDMEMW[position/2];
+ }
+
+   void test(){
+    int i = 0;
+    for(i;i<27;i++){
+        int j = 0;
+        //for(j;j<30000;j++){}
+            LCD_WriteSingle('b',6);
+
+    }
  }
 
 
@@ -267,7 +413,7 @@ void LCD_INIT( void )
     LCDBM0 = 0x21;
     LCDBM1 = 0x84;
 
-    LCDBLKCTL = LCDBLKPRE__512 |                               //Divide xtclk by 512
+    LCDBLKCTL = LCDBLKPRE__128 |                               //Divide xtclk by 512
             LCDBLKMOD_3;                                       //Switch between memory contents of LCDM and LCDB
 
     LCDCTL0 |= LCD4MUX | LCDON;                                // Turn on LCD, 4-mux selected
@@ -277,12 +423,13 @@ void LCD_INIT( void )
 
 }
 
-void LCD_WriteAll(char text1, char text2, char text3, char text4, char text5){
+void LCD_WriteAll(char text1, char text2, char text3, char text4, char text5, char text6){
     showChar(text1, pos1);
     showChar(text2, pos2);
     showChar(text3, pos3);
     showChar(text4, pos4);
     showChar(text5, pos5);
+    showChar(text6, pos6);
 }
 
 void LCD_WriteSingle(char text, int position){

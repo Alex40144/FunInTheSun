@@ -4,6 +4,7 @@
 #include "clock.h"
 #include "intrinsics.h"
 #include "time.h"
+#include "alarm.h"
 
 // defines to make it a little easier
 // we only need unsigned integers
@@ -30,7 +31,7 @@
 
   allocate memory for a fixed no. of PCBs
 ------------------------------------------------------------------------------*/
-#define MAX_PROCESSES   3
+#define MAX_PROCESSES   4
 #define STACK_SIZE      100
 
 struct ProcessControlBlock
@@ -235,18 +236,19 @@ int main(void)
 
 
     LCD_INIT();
-    setAlarm();
-    clearAlarm();
-    LCD_WriteAll('1','2','D','Z','A');
+    LCD_WriteAll('1','2','D','Z','A','O');
+    LCD_setBlink(1);
+    LCD_clearBlink(1);
     LCD_WriteSingle('F', 6);
 
     _BIS_SR(GIE);                   // interrupts enabled
 
     // Initialisation - Software
 
-    initialise_process(0, chrono);
-    initialise_process(1, clock);
-    initialise_process(2, time);
+    initialise_process(0, clock);
+    initialise_process(1, time);
+    initialise_process(2, alarm);
+    initialise_process(3, chrono);
 
 
     run_process(current_process);
@@ -264,7 +266,7 @@ int main(void)
 __interrupt void Port_1 (void)
 {
     __disable_interrupt();
-    __delay_cycles(20000);
+    __delay_cycles(40000);
 
     if (!(P1IN & BIT2)) { // Check again if switch is still pressed
             // Save first process details...

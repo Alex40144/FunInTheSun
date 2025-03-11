@@ -3,6 +3,7 @@
 #include "chrono.h"
 #include "clock.h"
 #include "intrinsics.h"
+#include "msp430fr4133.h"
 #include "time.h"
 #include "alarm.h"
 
@@ -12,8 +13,17 @@
 #define WORD unsigned short
 #define BYTE unsigned char
 
+int STARTSTOP_PRESSED = 0;
 
 
+void clearSTARTSTOP(){
+  P4OUT &= ~0x01;                 // Clear P4.0 (Green LED)
+  STARTSTOP_PRESSED = 0;
+}
+
+int getSTARTSTOP(){
+  return STARTSTOP_PRESSED;
+}
 /*F ----------------------------------------------------------------------------
   NAME :      green_led()
 
@@ -223,10 +233,18 @@ int main(void)
     P1IE  |= 0x04;  // Enable interrupt on P1.2
     P1IES |= 0x04;  // Set P1.2 button interrupt to be a high-to-low tranisition
     P1IFG &= ~0x04; // Clear local interrupt flag for P1.2
+
+
+    #define SW2 6
+    P2SEL0 &= ~(1<<SW2);
+    P2OUT |= (1<<SW2);
+    P2REN |= (1<<SW2);
+    P2DIR &= ~(1<<SW2);
+
+    P2IE  |= 0x40;  // Enable interrupt on P2.6
+    P2IES |= 0x40;  // Set P2.6 button interrupt to be a high-to-low tranisition
+    P2IFG &= ~0x40; // Clear local interrupt flag for P2.6
     
-
-    //P4OUT |=  0x40;               // Set P4.6 on  (Red LED)
-
 
                                     // Timer A0 (1ms interrupt)
     TA0CCR0 =  1024;                // Count up to 1024
@@ -325,6 +343,19 @@ __interrupt void Port_1 (void)
       );
     }
     P1IFG &= ~0x04; // Clear local interrupt flag for P1.2
+    _BIS_SR(GIE);                   // interrupts enabled
+
+}
+
+
+#pragma vector=PORT2_VECTOR
+__interrupt void Port_2 (void)
+{
+    __disable_interrupt();
+    __delay_cycles(40000);
+    P4OUT |= 0x01;                 // Set P4.0 (Green LED)
+    STARTSTOP_PRESSED = 1;
+    P2IFG &= ~BIT6; // Clear local interrupt flag for P2.6
     _BIS_SR(GIE);                   // interrupts enabled
 
 }

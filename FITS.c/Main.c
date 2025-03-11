@@ -2,7 +2,9 @@
 #include <msp430.h>
 #include "chrono.h"
 #include "clock.h"
+#include "intrinsics.h"
 #include "time.h"
+#include "alarm.h"
 
 // defines to make it a little easier
 // we only need unsigned integers
@@ -29,7 +31,7 @@
 
   allocate memory for a fixed no. of PCBs
 ------------------------------------------------------------------------------*/
-#define MAX_PROCESSES   3
+#define MAX_PROCESSES   4
 #define STACK_SIZE      100
 
 struct ProcessControlBlock
@@ -174,7 +176,6 @@ void run_process(unsigned int process_index)
 
 
 
-
 /*F ----------------------------------------------------------------------------
   NAME :      main()
 
@@ -212,39 +213,48 @@ int main(void)
     P1OUT &= ~0x01;                 // Set P1.0 off (Green LED)
     P4OUT &= ~0x01;                 // Set P4.6 off (Red LED)
 
+  // set SW1 as GPIO input with pullup
+    #define SW1 2
+    P1SEL0 &= ~(1<<SW1);
+    P1OUT |= (1<<SW1);
+    P1REN |= (1<<SW1);
+    P1DIR &= ~(1<<SW1);
+
+    P1IE  |= 0x04;  // Enable interrupt on P1.2
+    P1IES |= 0x04;  // Set P1.2 button interrupt to be a high-to-low tranisition
+    P1IFG &= ~0x04; // Clear local interrupt flag for P1.2
+    
+
     //P4OUT |=  0x40;               // Set P4.6 on  (Red LED)
 
 
                                     // Timer A0 (1ms interrupt)
     TA0CCR0 =  1024;                // Count up to 1024
-    TA0CCTL0 = 0x10;                // Enable counter interrupts, bit 4=1
+    //TA0CCTL0 = 0x10;                // Enable counter interrupts, bit 4=1
     TA0CTL =  TASSEL_2 + MC_1;      // Timer A using subsystem master clock, SMCLK(1.1 MHz)
                                     // and count UP to create a 1ms interrupt
 
 
     LCD_INIT();
-    setAlarm();
-    setChrono();
-    clearAlarm();
-    clearChrono();
-    LCD_WriteAll('1','2','D','Z','A','9');
-    LCD_WriteSingle('F', 3);
+    LCD_WriteAll('1','2','D','Z','A','O');
+    LCD_setBlink(1);
+    LCD_clearBlink(1);
+    LCD_WriteSingle('F', 6);
 
+    _BIS_SR(GIE);                   // interrupts enabled
 
     // Initialisation - Software
 
-    _BIS_SR(GIE);                   // interrupts enabled (we need to do it here so it gets saved to stack)
-
-    initialise_process(0, chrono);
-    initialise_process(1, clock);
-    initialise_process(2, time);
+    initialise_process(0, clock);
+    initialise_process(1, time);
+    initialise_process(2, alarm);
+    initialise_process(3, chrono);
 
 
     run_process(current_process);
 
 
 
-    _BIS_SR(GIE);                   // interrupts enabled
 
     for (;;)
     {
@@ -273,51 +283,48 @@ int main(void)
               [7]   get context from stack
 
 *F ---------------------------------------------------------------------------*/
-#pragma vector=TIMER0_A0_VECTOR
-__interrupt void Timer0_A0 (void)    // Timer0 A0 1ms interrupt service routine
+#pragma vector=PORT1_VECTOR
+__interrupt void Port_1 (void)
 {
-    // Save first process details...
+    __disable_interrupt();
+    __delay_cycles(40000);
 
-    asm(
+    if (!(P1IN & BIT2)) { // Check again if switch is still pressed
+            // Save first process details...
+      P1OUT ^= 0x01;                 // Set P1.0 toggle (Green LED)
 
-            " push.a R15\n"
-            " push.a R14\n"
-            " push.a R13\n"
-            " push.a R12\n"
-            " push.a R11\n"
-            " push.a R10\n"
-            " push.a R9\n"
-            " push.a R8\n"
-            " push.a R7\n"
-            " push.a R6\n"
-            " push.a R5\n"
-            " push.a R4\n"
-            " push.a R3\n"
-            " movx.a sp,&stack_pointer\n"
-        );
+     asm(
+              " push.a R10\n"
+              " push.a R9\n"
+              " push.a R8\n"
+              " push.a R7\n"
+              " push.a R6\n"
+              " push.a R5\n"
+              " push.a R4\n"
+              " push.a R3\n"
+              " movx.a sp,&stack_pointer\n"
+          );
 
-    process[current_process].sp = stack_pointer;
+      process[current_process].sp = stack_pointer;
 
-    current_process = (current_process+1) % MAX_PROCESSES;
+      current_process = (current_process+1) % MAX_PROCESSES;
 
-    stack_pointer = process[current_process].sp;
+      stack_pointer = process[current_process].sp;
 
-    asm(
-            " movx.a &stack_pointer,SP \n"
-            " pop.a R3 \n"
-            " pop.a R4 \n"
-            " pop.a R5 \n"
-            " pop.a R6 \n"
-            " pop.a R7 \n"
-            " pop.a R8 \n"
-            " pop.a R9 \n"
-            " pop.a R10 \n"
-            " pop.a R11 \n"
-            " pop.a R12 \n"
-            " pop.a R13 \n"
-            " pop.a R14 \n"
-            " pop.a R15 \n"
-            
+      asm(
+              " movx.a &stack_pointer,SP \n"
+              " pop.a R3 \n"
+              " pop.a R4 \n"
+              " pop.a R5 \n"
+              " pop.a R6 \n"
+              " pop.a R7 \n"
+              " pop.a R8 \n"
+              " pop.a R9 \n"
+              " pop.a R10 \n"
 
-    );
+      );
+    }
+    P1IFG &= ~0x04; // Clear local interrupt flag for P1.2
+    _BIS_SR(GIE);                   // interrupts enabled
+
 }

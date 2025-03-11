@@ -23,21 +23,21 @@ void chrono () {
         switch (state) {
             case IDLE:
                 //if button pressed move to start state
-                LCD_WriteAll('0','0','0','0','0');
+                LCD_WriteAll('1','0','0','0','0');
                 LCD_WriteSingle('0', 6);
-                if (!(P2IN & BIT6)) {
+                if (!(P2IN & BIT7)) {
                     state = START;
                 }
                 break;
             case START:
                 // save timer start time
-                startTime = TA0R;
+                startTime = TA0CCR0;
                 state = ACTIVE;
                 break;
             case ACTIVE:
             {
                 // timer is counting
-                int time = TA0R - startTime;
+                int time = TA0CCR0 - startTime;
                 char str[7];
                 sprintf(str, "%d", time);
                 LCD_WriteAll(str[0], str[1], str[2], str[3], str[4]);

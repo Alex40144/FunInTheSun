@@ -230,8 +230,8 @@ int main(void)
     P1IFG &= ~0x04; // Clear local interrupt flag for P1.2
     
 
-	TA0CCTL1 = CAP + CM_0 + SCS + CCIS_0;
-	TA0CTL |= TASSEL_2 + MC_2 + TACLR;
+    TA0CCR0 = 0;
+    TA0CTL = TASSEL_1 + MC_2 + TACLR;
 
 
     LCD_INIT();
@@ -260,27 +260,6 @@ int main(void)
     }
 }
 
-
-/*F ----------------------------------------------------------------------------
-  NAME :      Timer0_A0()
-
-  DESCRIPTION :
-              ISR for the timer0_A0 for interrupt
-
-  INPUTS :    none
-
-  RETURNS :   void
-
-  PROCESS :
-              [1]   save contexxt on PCB stack
-              [2]   stack_pointer <= sp
-              [3]   save stack_pointer in PCB sp
-              [4]   get next PCB
-              [5]   get PCB sp into stack_pointer
-              [6]   sp <= stack_pointer
-              [7]   get context from stack
-
-*F ---------------------------------------------------------------------------*/
 #pragma vector=PORT1_VECTOR
 __interrupt void Port_1 (void)
 {

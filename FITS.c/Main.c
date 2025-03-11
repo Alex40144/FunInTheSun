@@ -243,7 +243,9 @@ int main(void)
 
 
     LCD_INIT();
-    LCD_WriteAll('1','2','D','Z','A');
+    LCD_WriteAll('1','2','D','Z','A','O');
+    LCD_setBlink(1);
+    LCD_clearBlink(1);
     LCD_WriteSingle('F', 6);
 
     _BIS_SR(GIE);                   // interrupts enabled

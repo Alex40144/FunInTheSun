@@ -99,18 +99,21 @@ void time () {
 
         int i =0;
             for(i;i<30000;i++){
-        if(i==15000){
+                int var = getSTARTSTOP();
+                //test();
+        if(i==29999){
+            if(var == 1){
+                setLCDDate();
+                setLCDMonth();
+                LCD_setDecimals();
+                clearSTARTSTOP();
+                i = 0;
+            }else{
                 setLCDHours();
                 setLCDMins();
                 setLCDDotW();
                 LCD_setColon();
-                //test();
-
-        }else if(i==29999){
-                setLCDDate();
-                setLCDMonth();
-                LCD_setDecimals();
-                i = 0;
+            }
         }
     }
     }

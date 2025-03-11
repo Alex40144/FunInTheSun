@@ -435,4 +435,5 @@ void LCD_WriteAll(char text1, char text2, char text3, char text4, char text5, ch
 void LCD_WriteSingle(char text, int position){
     position = posLookUp[position-1];
     showChar(text, position);
+
 }

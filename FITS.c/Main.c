@@ -352,7 +352,7 @@ __interrupt void Port_1 (void)
 __interrupt void Port_2 (void)
 {
     __disable_interrupt();
-    __delay_cycles(40000);
+    __delay_cycles(100000);
     P4OUT |= 0x01;                 // Set P4.0 (Green LED)
     STARTSTOP_PRESSED = 1;
     P2IFG &= ~BIT6; // Clear local interrupt flag for P2.6

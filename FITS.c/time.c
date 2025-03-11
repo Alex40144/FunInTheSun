@@ -8,7 +8,6 @@ enum States{STATE_MINS,STATE_HOURS,STATE_DOTW,STATE_DATE,STATE_MONTH}Current_Sta
 
 
 int setLCDHours(){
-    LCD_ClearNums();
     int hours = currentDayTime[0];
     int hourDigitOne = hours / 10;
     int hourDigitTwo = hours % 10;
@@ -80,24 +79,105 @@ int setLCDMonth(){
 
 void time () {
     Current_State = STATE_MINS;
+    int NEW_STATE = 1;
+
     //do something
     while(1){
+        if(getSTARTSTOP()==1){
+            NEW_STATE = 1;
         switch (Current_State) {
+            case STATE_MINS:
+                Current_State = STATE_HOURS;
+                break;
+            case STATE_HOURS:
+                Current_State = STATE_DOTW;
+                break;
+            case STATE_DOTW:
+                Current_State = STATE_MONTH;
+                break;
+            case STATE_DATE:
+                Current_State = STATE_MINS;
+                break;
+            case STATE_MONTH:
+                Current_State = STATE_DATE;
+                break;
+            default:
+                break;
+        }
+            clearSTARTSTOP();
+        }  
+        switch (Current_State) {
+
         case STATE_MINS:
+            if(NEW_STATE == 1){
+                LCD_ClearNums();
+                setLCDMins();
+                setLCDHours();
+                setLCDDotW();
+                LCD_setColon();
+                LCD_setBlink(3);
+                LCD_setBlink(4);
+                NEW_STATE = 0;
+            }
             break;
+
         case STATE_HOURS:
+            if(NEW_STATE == 1){
+                LCD_ClearNums();
+                setLCDMins();
+                setLCDHours();
+                setLCDDotW();
+                LCD_setColon();
+                LCD_setBlink(1);
+                LCD_setBlink(2);
+                NEW_STATE = 0;
+            }
             break;
+
         case STATE_DOTW:
+            if(NEW_STATE == 1){
+                LCD_ClearNums();
+                setLCDMins();
+                setLCDHours();
+                setLCDDotW();
+                LCD_setColon();
+                LCD_setBlink(5);
+                LCD_setBlink(6);
+                NEW_STATE = 0;
+            }
             break;
-        case STATE_DATE:
-            break;
+
         case STATE_MONTH:
+            if(NEW_STATE == 1){
+                LCD_ClearNums();
+                setLCDMonth();
+                setLCDDate();
+                setLCDDotW();
+                LCD_setDecimals();
+                LCD_setBlink(3);
+                LCD_setBlink(4);
+                NEW_STATE = 0;
+            }
             break;
+
+        case STATE_DATE:
+            if(NEW_STATE == 1){
+                LCD_ClearNums();
+                setLCDMonth();
+                setLCDDate();
+                setLCDDotW();
+                LCD_setDecimals();
+                LCD_setBlink(1);
+                LCD_setBlink(2);
+                NEW_STATE = 0;
+            }
+            break;
+
         default:
             break;
         }
 
-        int i =0;
+        /*int i =0;
             for(i;i<30000;i++){
                 int var = getSTARTSTOP();
                 //test();
@@ -115,7 +195,8 @@ void time () {
                 LCD_setColon();
             }
         }
-    }
+        }*/
+    
     }
 }
 

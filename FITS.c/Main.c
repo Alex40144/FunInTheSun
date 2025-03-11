@@ -224,7 +224,7 @@ int main(void)
     P4OUT &= ~0x01;                 // Set P4.6 off (Red LED)
 
   // set SW1 as GPIO input with pullup // MODE button of system
-    #define SW1 2
+    #define SW1 2 // SW1 as MODE button of system
     P1SEL0 &= ~(1<<SW1);
     P1OUT |= (1<<SW1);
     P1REN |= (1<<SW1);
@@ -235,7 +235,7 @@ int main(void)
     P1IFG &= ~0x04; // Clear local interrupt flag for P1.2
 
      // set SW2 (P2.6) as GPIO input with pullup
-    #define SW2 6 // SW2 as LAP/RESET button of system
+    #define SW2 6 // SW2 as START/STOP button of system
     P2SEL0 &= ~(1<<SW2);
     P2OUT |= (1<<SW2);
     P2REN |= (1<<SW2);
@@ -244,8 +244,8 @@ int main(void)
     P2IES |= 0x40;  // Set P2.6 button interrupt to be a high-to-low tranisition
     P2IFG &= ~0x40; // Clear local interrupt flag for P2.6
 
-    // set SW3 as P1.4 (input with pull up) and P1.5 (output set LOW) for START/STOP button of system (use jumper wire)
-    #define SW3 4 // SW3 as START/STOP button of system
+    // set SW3 as P1.4 (input with pull up) and P1.5 (output set LOW) for button of system (use jumper wire)
+    #define SW3 4 // SW3 as LAP/RESET button of system
     P1SEL0 &= ~(1<<SW3);
     P1OUT |= (1<<SW3);
     P1REN |= (1<<SW3);
@@ -263,10 +263,8 @@ int main(void)
 
 
     LCD_INIT();
-    LCD_WriteAll('1','2','D','Z','A','O');
-    LCD_setBlink(1);
-    LCD_clearBlink(1);
-    LCD_WriteSingle('F', 6);
+    LCD_WriteAll('S','T','P','W','C','H'); // initialisation visual indicator
+    __delay_cycles(400000);
 
     _BIS_SR(GIE);                   // interrupts enabled
 

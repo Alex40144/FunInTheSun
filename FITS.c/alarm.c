@@ -61,17 +61,17 @@ while(1){
                 // if start/stop button pressed, increment digits
                 //if lap/reset button pressed move to hours state
                 __delay_cycles(50000);
-                if (!(P2IN & BIT6)) {
+                if (!(P1IN & BIT4)) {
                     __delay_cycles(150000);
-                    if (!(P2IN & BIT6)) {
+                    if (!(P1IN & BIT4)) {
                         currentState = HOURS;
                     } // Check again if switch is still pressed}
                     }
                 
                 // check if START/STOP is pressed to increment alarm time
-                if (!(P1IN & BIT4)) {
+                if (!(P2IN & BIT6)) {
                     __delay_cycles(150000);
-                    while (!(P1IN & BIT4)) {
+                    while (!(P2IN & BIT6)) {
                         currentAlarmHoursMins[1] = currentAlarmHoursMins[1] + 1;
                         if (currentAlarmHoursMins[1] == 60) // check if passed 60 minute clock limit
                         {
@@ -101,17 +101,18 @@ while(1){
             // if start/stop button pressed, increment digits
                 //if lap/reset button pressed move to minutes state
                 __delay_cycles(50000);
-                if (!(P2IN & BIT6)) {
+                if (!(P1IN & BIT4)) {
                     __delay_cycles(150000);
-                    if (!(P2IN & BIT6)) {
+                    if (!(P1IN & BIT4)) {
                         currentState = MINUTES;
+                        __delay_cycles(100000);
                     } // Check again if switch is still pressed}
                     }
 
                 // check if START/STOP is pressed to increment alarm time
-                if (!(P1IN & BIT4)) {
+                if (!(P2IN & BIT6)) {
                     __delay_cycles(150000);
-                    while (!(P1IN & BIT4)) {
+                    while (!(P2IN & BIT6)) {
                         currentAlarmHoursMins[0] = currentAlarmHoursMins[0] + 1;
                         if (currentAlarmHoursMins[0] == 24) // check if passed 24 hour clock limit
                         {

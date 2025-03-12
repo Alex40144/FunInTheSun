@@ -453,7 +453,7 @@ void LCD_INIT( void )
     LCDBM0 = 0x21;
     LCDBM1 = 0x84;
 
-    LCDBLKCTL = LCDBLKPRE__128 |                               //Divide xtclk by 512
+    LCDBLKCTL = LCDBLKPRE__32 |                               //Divide xtclk by 512
             LCDBLKMOD_3;                                       //Switch between memory contents of LCDM and LCDB
 
     LCDCTL0 |= LCD4MUX | LCDON;                                // Turn on LCD, 4-mux selected

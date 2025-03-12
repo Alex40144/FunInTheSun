@@ -251,6 +251,46 @@ const char alphabetSmall[26][2] =
      }
  }
 
+ void showCharBlink(char c, int position)
+ {
+     if (c == ' ')
+     {
+         // Display space
+         LCDMEMW[position/2] = 0;
+         LCDBMEMW[position/2] = 0;
+     }
+     else if (c >= '0' && c <= '9')
+     {
+         // Display digit
+         LCDMEMW[position/2] = digit[c-48][0] | (digit[c-48][1] << 8);
+         LCDBMEMW[position/2] = 0;
+     }
+    else if (c >= 0 && c <= 9)
+     {
+         // Display digit
+         LCDMEMW[position/2] = digit[c][0] | (digit[c][1] << 8);
+         LCDBMEMW[position/2] = 0;
+     }
+     else if (c >= 'A' && c <= 'Z')
+     {
+         // Display alphabet
+         LCDMEMW[position/2] = alphabetBig[c-65][0] | (alphabetBig[c-65][1] << 8);
+         LCDBMEMW[position/2] = 0;
+     }
+     else if (c >= 'a' && c <= 'z')
+     {
+         // Display alphabet
+         LCDMEMW[position/2] = alphabetSmall[c-97][0] | (alphabetSmall[c-97][1] << 8);
+         LCDBMEMW[position/2] = 0;
+     }
+     else
+     {
+         // Turn all segments on if character is not a space, digit, or uppercase letter
+         LCDMEMW[position/2] = 0xFFFF;
+         LCDBMEMW[position/2] = 0xFFFF;
+     }
+ }
+
 
  void LCD_setAlarm(){
     int position = 12;
@@ -413,14 +453,13 @@ void LCD_INIT( void )
     LCDBM0 = 0x21;
     LCDBM1 = 0x84;
 
-    LCDBLKCTL = LCDBLKPRE__128 |                               //Divide xtclk by 512
+    LCDBLKCTL = LCDBLKPRE__32 |                               //Divide xtclk by 512
             LCDBLKMOD_3;                                       //Switch between memory contents of LCDM and LCDB
 
     LCDCTL0 |= LCD4MUX | LCDON;                                // Turn on LCD, 4-mux selected
 
     PMMCTL0_H = PMMPW_H;                                       // Open PMM Registers for write
     PMMCTL0_L |= PMMREGOFF_L;                                  // and set PMMREGOFF
-
 }
 
 void LCD_WriteAll(char text1, char text2, char text3, char text4, char text5, char text6){
@@ -435,5 +474,4 @@ void LCD_WriteAll(char text1, char text2, char text3, char text4, char text5, ch
 void LCD_WriteSingle(char text, int position){
     position = posLookUp[position-1];
     showChar(text, position);
-
 }

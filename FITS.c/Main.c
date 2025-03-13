@@ -361,6 +361,24 @@ __interrupt void Port_1 (void)
 }
 
 
+/*F ----------------------------------------------------------------------------
+  NAME :      Port_2()
+
+  DESCRIPTION :
+              ISR for a value change on the port two register
+
+  INPUTS :    void
+
+  RETURNS :   void
+
+  PROCESS :
+              [1]   Disable interrupts
+              [2]   Wait for 100ms to prevent double presses
+              [3]   Toggle an LED
+              [4]   Set a flag
+              [5]   Reset the interrupt and enables interrupts
+*F ---------------------------------------------------------------------------*/
+
 #pragma vector=PORT2_VECTOR
 __interrupt void Port_2 (void)
 {
@@ -374,7 +392,19 @@ __interrupt void Port_2 (void)
 }
 
 
-//1 Second interrupt timer
+/*F ----------------------------------------------------------------------------
+  NAME :      Timer_A1()
+
+  DESCRIPTION :
+              ISR for timer A1 interrupt, runs every 1 second
+
+  INPUTS :    void
+
+  RETURNS :   void
+
+  PROCESS :
+              [1]   Increment time storage in memory
+*F ---------------------------------------------------------------------------*/
 #pragma vector=TIMER1_A0_VECTOR
 __interrupt void Timer_A1_ISR (void)    
 {

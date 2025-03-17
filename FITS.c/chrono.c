@@ -25,20 +25,22 @@ void chrono () {
             case IDLE:
                 //if button pressed move to start state
                 LCD_WriteAll('1','0','0','0','0', '0');
-                if (!(P2IN & BIT6)) {
+                LCD_setChrono();
+                if (getSTARTSTOP()) {
                     state = START;
+                    clearSTARTSTOP();
                 }
                 break;
             case START:
                 // save timer start time
-                startTime = TA0CCR0;
+                startTime = getGlobalTimer();
                 state = ACTIVE;
                 break;
             case ACTIVE:
             {
                 // timer is counting
                 // int time = TA0CCR0 - startTime;
-                uint16_t time = 534;
+                uint16_t time = getGlobalTimer() - startTime;
                 // Calculate minutes, seconds, and centiseconds
                 // Calculate minutes, seconds, and centiseconds
                 int minutes = time / 6000;               // 1 minute = 6000 centiseconds
@@ -56,10 +58,15 @@ void chrono () {
                 LCD_WriteAll(digits[0], digits[1], digits[2], digits[3], digits[4], digits[5]);
                 LCD_setColon();
                 LCD_setDecimalTwo();
+
+                if (getSTARTSTOP()) {
+                    state = STOPPED;
+                    clearSTARTSTOP();
+                }
                 break;
             }
             case STOPPED:
-                // timer is stopped showing what it stopped on
+                //reset.
                 break;
         }
     }

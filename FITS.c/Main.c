@@ -15,6 +15,12 @@
 
 int STARTSTOP_PRESSED = 0;
 
+int globalTimer = 0;
+
+int getGlobalTimer() {
+  return globalTimer;
+}
+
 
 void clearSTARTSTOP(){
   P4OUT &= ~0x01;                 // Clear P4.0 (Green LED)
@@ -261,9 +267,9 @@ int main(void)
     P1OUT &= ~(1<<SW3OUTPUT);  // Set low (for SW3)
     
 
-    TA0CCR0 = 0;
-    TA0CTL = TASSEL_1 + MC_2 + TACLR;
-
+    TA0CCTL0 |= CCIE;
+    TA0CCR0 = 10000;  
+    TA0CTL |= TASSEL__SMCLK | MC__CONTINUOUS; // ACLK, Up mode
 
     LCD_INIT();
     LCD_WriteAll('S','T','P','W','C','H'); // initialisation visual indicator
@@ -347,4 +353,13 @@ __interrupt void Port_2 (void)
     P2IFG &= ~BIT6; // Clear local interrupt flag for P2.6
     _BIS_SR(GIE);                   // interrupts enabled
 
+}
+
+
+#pragma vector = TIMER0_A0_VECTOR
+__interrupt void Timer_A (void)
+{
+  P1OUT ^= BIT0;
+	TA0CCR0 += 10000; 
+  globalTimer++;
 }

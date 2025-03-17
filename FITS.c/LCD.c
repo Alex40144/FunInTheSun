@@ -1,124 +1,20 @@
-/* --COPYRIGHT--,BSD_EX
- * Copyright (c) 2013, Texas Instruments Incorporated
- * All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- *
- * *  Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- *
- * *  Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the
- *    documentation and/or other materials provided with the distribution.
- *
- * *  Neither the name of Texas Instruments Incorporated nor the names of
- *    its contributors may be used to endorse or promote products derived
- *    from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
- * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
- * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
- * PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
- * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
- * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
- * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
- * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
- * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- *******************************************************************************
- *
- *                       MSP430 CODE EXAMPLE DISCLAIMER
- *
- * MSP430 code examples are self-contained low-level programs that typically
- * demonstrate a single peripheral function or device feature in a highly
- * concise manner. For this the code may rely on the device's power-on default
- * register values and settings such as the clock configuration and care must
- * be taken when combining code from several examples to avoid potential side
- * effects. Also see www.ti.com/grace for a GUI- and www.ti.com/msp430ware
- * for an API functional library-approach to peripheral configuration.
- *
- * --/COPYRIGHT--*/
-//******************************************************************************
-//   MSP430FR4133 Demo -  LCD_E, Display "HELLO WORLD" using blink memory.
-//
-//   Description: Displays "HELLO" then "WORLD" using LCD blink memory while the
-//                device is in LPM3.5.
-//                f(LCD) = 32768Hz/((7+1)*16) = 256Hz,
-//                ACLK = default REFO ~32768Hz,
-//                MCLK = SMCLK = default DCODIV ~1MHz.
-//
-//                MSP430FR4133
-//             -----------------
-//         /|\|                 |
-//          | |              XIN|--
-// GND      --|RST              |  ~32768Hz
-//  |         |             XOUT|--
-//  |--0.1uF--|R13              |
-//  |--0.1uF--|R23      (L3)COM3|----------------|
-//  |--0.1uF--|R33      (L2)COM2|---------------||
-//          --|LCDC2    (L1)COM1|--------------|||
-//     4.7uF  |         (L0)COM0|-------------||||
-//          --|LCDC1            |    -------------
-//            |           L4~L39|---| 1 2 3 4 5 6 |
-//            |   except L27~L35|    -------------
-//            |                 |       TI LCD
-//            |                 |
-//
-//  LCD pin - Port Pin Map
-//  LCD pin   FR4133_LineX
-//    1         L8  (P3.0)
-//    2         L9  (P3.1)
-//    3         L10 (P3.2)
-//    4         L11 (P3.3)
-//    5         L12 (P3.4)
-//    6         L13 (P3.5)
-//    7         L14 (P3.6)
-//    8         L15 (P3.7)
-//    9         L16 (P6.0)
-//    10        L17 (P6.1)
-//    11        L18 (P6.2)
-//    12        L19 (P6.3)
-//    13        L20 (P6.4)
-//    14        L21 (P6.5)
-//    15        L22 (P6.6)
-//    16        L23 (P6.7)
-//    17        L4  (P7.4)
-//    18        L5  (P7.5)
-//    19        L6  (P7.6)
-//    20        L7  (P7.7)
-//    21        L3  (P7.3)
-//    22        L2  (P7.2)
-//    23        L1  (P7.1)
-//    24        L0  (P7.0)
-//    25        -
-//    26        -
-//    27        -
-//    28        -
-//    29        -
-//    30        -
-//    31        -
-//    32        L24 (P2.0)
-//    33        L25 (P2.1)
-//    34        L26 (P2.2)
-//    35        L36 (P5.4)
-//    36        L37 (P5.5)
-//    37        L38 (P5.6)
-//    38        L39 (P5.7)
-//
-//  Kathryn Adamsky
-//  Texas Instruments Inc.
-//  June 2016
-//  Built with Code Composer Studio v6.1.3
-//******************************************************************************
+
+/* -----------------------------------------------------------------------------
+    Include libraries
+    [msp430.h] for board specific registers
+------------------------------------------------------------------------------*/
 #include <msp430.h>
 
-
+/* -----------------------------------------------------------------------------
+    Function prototypes
+------------------------------------------------------------------------------*/
 void showChar(char c, int position);
 void showCharB(char c, int position);
+
+/* -----------------------------------------------------------------------------
+    The LCD memory areas for each digit are non sequential
+    Positions below correspond from left to right of the LCD
+------------------------------------------------------------------------------*/
 #define pos1 4                                                 // Digit A1 - L4
 #define pos2 6                                                 // Digit A2 - L6
 #define pos3 8                                                 // Digit A3 - L8
@@ -127,16 +23,26 @@ void showCharB(char c, int position);
 #define pos6 18                                                // Digit A6 - L18
 #define pos7 1                                                // Digit A6 - L18
 
+/* -----------------------------------------------------------------------------
+    Lookup table for the positions for use with array data
+------------------------------------------------------------------------------*/
 int posLookUp[] = {4,6,8,10,2,18,1};
 
-// Define word access definitions to LCD memories
+/* -----------------------------------------------------------------------------
+    Definitions of the LCD memory to make writing to them simpler
+    The memory consists of two parts which both need to be written to to make a static number
+    LCDMEMW is the first half
+    LCDBMEMW is the second half
+------------------------------------------------------------------------------*/
 #define LCDMEMW ((int*)LCDMEM)
 #define LCDBMEMW ((int*)LCDBMEM)
 
-// LCD memory map for numeric digits
+/* -----------------------------------------------------------------------------
+    LCD memory for each digit to be displayed
+------------------------------------------------------------------------------*/
 const char digit[10][2] =
 {
-    {0xFC, 0x28},  /* "0" LCD segments a+b+c+d+e+f+k+q */
+    {0xFC, 0x28},  /* "0" */
     {0x60, 0x20},  /* "1" */
     {0xDB, 0x00},  /* "2" */
     {0xF3, 0x00},  /* "3" */
@@ -148,10 +54,12 @@ const char digit[10][2] =
     {0xF7, 0x00}   /* "9" */
 };
 
-// LCD memory map for uppercase letters
+/* -----------------------------------------------------------------------------
+    LCD memory for upper case letter to be displayed
+------------------------------------------------------------------------------*/
 const char alphabetBig[26][2] =
 {
-    {0xEF, 0x00},  /* "A" LCD segments a+b+c+e+f+g+m */
+    {0xEF, 0x00},  /* "A" */
     {0xF1, 0x50},  /* "B" */
     {0x9C, 0x00},  /* "C" */
     {0xF0, 0x50},  /* "D" */
@@ -179,7 +87,9 @@ const char alphabetBig[26][2] =
     {0x90, 0x28}   /* "Z" */
 };
 
-//Small alphabet
+/* -----------------------------------------------------------------------------
+    LCD memory for lower case letter to be displayed
+------------------------------------------------------------------------------*/
 const char alphabetSmall[26][2] =
 {
     {0xFB, 0x00},  /* "a" */
@@ -210,7 +120,25 @@ const char alphabetSmall[26][2] =
     {0x90, 0x28}   /* "z" */
 };
 
-//Writes to screen 1
+/*F ----------------------------------------------------------------------------
+  NAME :      showChar()
+
+  DESCRIPTION :
+                Writes a provided character to a specific position on the LCD screen
+
+  INPUTS :      
+                char c : This is the character which is to be displayed on the LCD
+                int position : This is the position (1-6) where the character needs to be displayed
+
+  RETURNS :     void
+
+  PROCESS :
+                [1]     Identify which type of character it is (Space, Upper case, Lower case, Digit, Erroneous)
+                [2]     Identify the correct character memory map
+                [3]     Read memory map information
+                [4]     Write the memory information to the first half of the memory
+                [5]     Write the memory information to the second half of the memory
+*F ---------------------------------------------------------------------------*/
  void showChar(char c, int position)
  {
      if (c == ' ')
@@ -251,38 +179,117 @@ const char alphabetSmall[26][2] =
      }
  }
 
+/*F ----------------------------------------------------------------------------
+  NAME :      LCD_setAlarm()
 
+  DESCRIPTION :
+                Enables the alarm icon on the LCD
+
+  INPUTS :      void
+
+  RETURNS :     void
+
+  PROCESS :
+                [1]     Set the LCD to display a "1" in the location of the alarm icon so it enables
+*F ---------------------------------------------------------------------------*/
  void LCD_setAlarm(){
     int position = 12;
     LCDMEMW[position/2] |= 0x2;
     LCDBMEMW[position/2] |= 0x2;
  }
 
+/*F ----------------------------------------------------------------------------
+  NAME :      LCD_clearAlarm()
+
+  DESCRIPTION :
+                Disables the alarm icon on the LCD
+
+  INPUTS :      void
+
+  RETURNS :     void
+
+  PROCESS :
+                [1]     Set the LCD to display a "0" in the location of the alarm icon so it disables
+*F ---------------------------------------------------------------------------*/
   void LCD_clearAlarm(){
     int position = 12;
     LCDMEMW[position/2] &= ~0x2;
     LCDBMEMW[position/2] &= ~0x2;
  }
 
+/*F ----------------------------------------------------------------------------
+  NAME :      LCD_setStopWatch()
+
+  DESCRIPTION :
+                Enables the stopwatch icon on the LCD
+
+  INPUTS :      void
+
+  RETURNS :     void
+
+  PROCESS :
+                [1]     Set the LCD to display a "1" in the location of the stopwatch icon so it enables
+*F ---------------------------------------------------------------------------*/
   void LCD_setStopWatch(){
     int position = 12;
     LCDMEMW[position/2] |= 0x8;
     LCDBMEMW[position/2] |= 0x8;
  }
 
+/*F ----------------------------------------------------------------------------
+  NAME :      LCD_clearStopWatch()
+
+  DESCRIPTION :
+                Disables the stopwatch icon on the LCD
+
+  INPUTS :      void
+
+  RETURNS :     void
+
+  PROCESS :
+                [1]     Set the LCD to display a "0" in the location of the stopwatch icon so it disables
+*F ---------------------------------------------------------------------------*/
   void LCD_clearStopWatch(){
     int position = 12;
     LCDMEMW[position/2] &= ~0x08;
     LCDBMEMW[position/2] &= ~0x08;
  }
 
+/*F ----------------------------------------------------------------------------
+  NAME :      LCD_setChrono()
+
+  DESCRIPTION :
+                Enables the chrono icon on the LCD
+
+  INPUTS :      void
+
+  RETURNS :     void
+
+  PROCESS :
+                [1]     Set the LCD to display a "1" in the location of the chrono spike icon so it enables
+                [2]     Set the LCD to display a "1" in the location of the rx/tx icon so it enables
+*F ---------------------------------------------------------------------------*/
   void LCD_setChrono(){
-    LCDMEMW[4] |= 0x0400;//The main symbol
+    LCDMEMW[4] |= 0x0400;//The spike symbol
     LCDBMEMW[4] |= 0x0400;
     LCDMEMW[9] |= 0x0500;//The TX RX symbol
     LCDBMEMW[9] |= 0x0500;
  }
 
+/*F ----------------------------------------------------------------------------
+  NAME :      LCD_clearChrono()
+
+  DESCRIPTION :
+                Disables the chrono icon on the LCD
+
+  INPUTS :      void
+
+  RETURNS :     void
+
+  PROCESS :
+                [1]     Set the LCD to display a "0" in the location of the chrono spike icon so it disables
+                [2]     Set the LCD to display a "0" in the location of the rx/tx icon so it disables
+*F ---------------------------------------------------------------------------*/
   void LCD_clearChrono(){
     LCDMEMW[4] &= ~0x0400;
     LCDBMEMW[4] &= ~0x0400;
@@ -290,47 +297,151 @@ const char alphabetSmall[26][2] =
     LCDBMEMW[9] &= ~0x0500;
  }
 
+/*F ----------------------------------------------------------------------------
+  NAME :      LCD_setColon()
+
+  DESCRIPTION :
+                Enables the colon icon on the LCD between characters 2 and 3
+
+  INPUTS :      void
+
+  RETURNS :     void
+
+  PROCESS :
+                [1]     Set the LCD to display a "1" in the location of the colon icon so it enables
+*F ---------------------------------------------------------------------------*/
    void LCD_setColon(){
-    LCDMEMW[3] |= 0x0400;//The main symbol
+    LCDMEMW[3] |= 0x0400;
     LCDBMEMW[3] |= 0x0400;
 
  }
 
+/*F ----------------------------------------------------------------------------
+  NAME :      LCD_clearColon()
+
+  DESCRIPTION :
+                Disables the colon icon on the LCD between characters 2 and 3
+
+  INPUTS :      void
+
+  RETURNS :     void
+
+  PROCESS :
+                [1]     Set the LCD to display a "0" in the location of the colon icon so it disables
+*F ---------------------------------------------------------------------------*/
   void LCD_clearColon(){
     LCDMEMW[3] &= ~0x0400;
     LCDBMEMW[3] &= ~0x0400;
  }
 
+/*F ----------------------------------------------------------------------------
+  NAME :      LCD_setDecimalOne()
+
+  DESCRIPTION :
+                Enables the decimal icon on the LCD between characters 2 and 3
+
+  INPUTS :      void
+
+  RETURNS :     void
+
+  PROCESS :
+                [1]     Set the LCD to display a "1" in the location of the decimal icon so it enables
+*F ---------------------------------------------------------------------------*/
    void LCD_setDecimalOne(){
-    LCDMEMW[3] |= 0x0100;//The main symbol
+    LCDMEMW[3] |= 0x0100;
     LCDBMEMW[3] |= 0x0100;
 
  }
 
+/*F ----------------------------------------------------------------------------
+  NAME :      LCD_clearDecimalOne()
+
+  DESCRIPTION :
+                Disables the decimal icon on the LCD between characters 2 and 3
+
+  INPUTS :      void
+
+  RETURNS :     void
+
+  PROCESS :
+                [1]     Set the LCD to display a "0" in the location of the decimal icon so it disables
+*F ---------------------------------------------------------------------------*/
   void LCD_clearDecimalOne(){
     LCDMEMW[3] &= ~0x0100;
     LCDBMEMW[3] &= ~0x0100;
  }
 
+/*F ----------------------------------------------------------------------------
+  NAME :      LCD_setDecimalTwo()
+
+  DESCRIPTION :
+                Enables the decimal icon on the LCD between characters 4 and 5
+
+  INPUTS :      void
+
+  RETURNS :     void
+
+  PROCESS :
+                [1]     Set the LCD to display a "1" in the location of the decimal icon so it enables
+*F ---------------------------------------------------------------------------*/
     void LCD_setDecimalTwo(){
-    LCDMEMW[5] |= 0x0100;//The main symbol
+    LCDMEMW[5] |= 0x0100;
     LCDBMEMW[5] |= 0x0100;
 
  }
 
+/*F ----------------------------------------------------------------------------
+  NAME :      LCD_clearDecimalTwo()
+
+  DESCRIPTION :
+                Disables the decimal icon on the LCD between characters 4 and 5
+
+  INPUTS :      void
+
+  RETURNS :     void
+
+  PROCESS :
+                [1]     Set the LCD to display a "0" in the location of the decimal icon so it disables
+*F ---------------------------------------------------------------------------*/
   void LCD_clearDecimalTwo(){
     LCDMEMW[5] &= ~0x0100;
     LCDBMEMW[5] &= ~0x0100;
  }
  
+ /*F ----------------------------------------------------------------------------
+  NAME :      LCD_setDecimals()
+
+  DESCRIPTION :
+                Enables the decimal icons on the LCD between characters 2 and 3 & 4 and 5
+
+  INPUTS :      void
+
+  RETURNS :     void
+
+  PROCESS :
+                [1]     Set the LCD to display a "1" in the locations of the decimal icons so they enable
+*F ---------------------------------------------------------------------------*/
  void LCD_setDecimals(){
-    LCDMEMW[5] |= 0x0100;//The main symbol
+    LCDMEMW[5] |= 0x0100;
     LCDBMEMW[5] |= 0x0100;
-    LCDMEMW[3] |= 0x0100;//The main symbol
+    LCDMEMW[3] |= 0x0100;
     LCDBMEMW[3] |= 0x0100;
 
  }
 
+ /*F ----------------------------------------------------------------------------
+  NAME :      LCD_clearDecimals()
+
+  DESCRIPTION :
+                Disables the decimal icons on the LCD between characters 2 and 3 & 4 and 5
+
+  INPUTS :      void
+
+  RETURNS :     void
+
+  PROCESS :
+                [1]     Set the LCD to display a "0" in the locations of the decimal icons so they disable
+*F ---------------------------------------------------------------------------*/
   void LCD_clearDecimals(){
     LCDMEMW[5] &= ~0x0100;
     LCDBMEMW[5] &= ~0x0100;
@@ -338,6 +449,21 @@ const char alphabetSmall[26][2] =
     LCDBMEMW[3] &= ~0x0100;
  }
 
+/*F ----------------------------------------------------------------------------
+  NAME :      LCD_ClearNums()
+
+  DESCRIPTION :
+                Removes all numbers from the display by writing a blank digit to the screen in each position
+                The symbol characters state's are maintained
+
+  INPUTS :      void
+
+  RETURNS :     void
+
+  PROCESS :
+                [1]     Set the LCD to display a " " in the number locations one by one
+                [2]     The LCD one character at a time becomes blank - This progess is invisible to the human eye
+*F ---------------------------------------------------------------------------*/
  void LCD_ClearNums(){
   showChar(' ', pos1);
   showChar(' ', pos2);
@@ -347,26 +473,67 @@ const char alphabetSmall[26][2] =
   showChar(' ', pos6);
  }
 
+/*F ----------------------------------------------------------------------------
+  NAME :      LCD_setBlink()
+
+  DESCRIPTION :
+                Sets a specified character to start blinking by toggling on and off
+
+  INPUTS :      
+                int position : The position of the character (1-6) that needs to start blinking
+
+  RETURNS :     void
+
+  PROCESS :
+                [1]     Get the memory location of the LCD character that needs to blink
+                [2]     Set half of the memory blank so toggling between the two give a blinking effect
+*F ---------------------------------------------------------------------------*/
  void LCD_setBlink(int position){
     position = posLookUp[position-1];
     LCDBMEMW[position/2] = 0;
  }
 
+/*F ----------------------------------------------------------------------------
+  NAME :      LCD_clearBlink()
+
+  DESCRIPTION :
+                Sets a specified character to stop blinking 
+
+  INPUTS :      
+                int position : The position of the character (1-6) that needs to stop blinking
+
+  RETURNS :     void
+
+  PROCESS :
+                [1]     Get the memory location of the LCD character that needs to stop blinking
+                [2]     Copy the half of the memory with the stored information to the blank memory to create a static number
+*F ---------------------------------------------------------------------------*/
 void LCD_clearBlink(int position){
     position = posLookUp[position-1];
     LCDBMEMW[position/2] = LCDMEMW[position/2];
  }
 
-   void test(){
-    int i = 0;
-    for(i;i<27;i++){
-        int j = 0;
-        //for(j;j<30000;j++){}
-            LCD_WriteSingle('b',6);
+/*F ----------------------------------------------------------------------------
+  NAME :      LCD_INIT()
 
-    }
- }
+  DESCRIPTION :
+                Initialise the LCD so that it can be used to display information.
+                This function needs to be called before any of the others in this file.
 
+  INPUTS :      void
+
+  RETURNS :     void
+
+  PROCESS :
+                [1]     Disable the watchdog time
+                [2]     Setup the crystal oscillator to allow toggling of two number states
+                [3]     Configure the LCD pinout
+                [4]     Enable the charge pump
+                [5]     Configure the LCD
+                [6]     Clear the previous memory
+                [7]     Divide the clock to give a slower flashing effect
+                [8]     Enable writing to the LCD     
+*F ---------------------------------------------------------------------------*/
 
 void LCD_INIT( void )
 {
@@ -413,16 +580,31 @@ void LCD_INIT( void )
     LCDBM0 = 0x21;
     LCDBM1 = 0x84;
 
-    LCDBLKCTL = LCDBLKPRE__128 |                               //Divide xtclk by 512
+    LCDBLKCTL = LCDBLKPRE__32 |                               //Divide xtclk by 512
             LCDBLKMOD_3;                                       //Switch between memory contents of LCDM and LCDB
 
     LCDCTL0 |= LCD4MUX | LCDON;                                // Turn on LCD, 4-mux selected
 
     PMMCTL0_H = PMMPW_H;                                       // Open PMM Registers for write
     PMMCTL0_L |= PMMREGOFF_L;                                  // and set PMMREGOFF
-
 }
 
+/*F ----------------------------------------------------------------------------
+  NAME :      LCD_WriteAll()
+
+  DESCRIPTION :
+                A singular function to write to the LCD which displays characters (1-6)
+
+  INPUTS :      
+                char[6] : Takes in six characters which will be displayed in order of being passed
+
+  RETURNS :     void
+
+  PROCESS :
+                [1]     Take the first input to the function and write it to the first position on the LCD
+                [2]     Take the second input to the function and write it to the second position on the LCD
+                [3]     This process is the same for characters 3-6 
+*F ---------------------------------------------------------------------------*/
 void LCD_WriteAll(char text1, char text2, char text3, char text4, char text5, char text6){
     showChar(text1, pos1);
     showChar(text2, pos2);
@@ -432,8 +614,23 @@ void LCD_WriteAll(char text1, char text2, char text3, char text4, char text5, ch
     showChar(text6, pos6);
 }
 
+/*F ----------------------------------------------------------------------------
+  NAME :      LCD_WriteSingle()
+
+  DESCRIPTION :
+                Writes a provided character to a given LCD location
+
+  INPUTS :      
+                char    : The character to be displayed on the LCD
+                int     : The LCD position number to be written too (1-6)
+
+  RETURNS :     void
+
+  PROCESS :
+                [1]     Using the position data use a look up to identify the LCD memory location to write to
+                [2]     Call the function showChar to display the character at the found memory location
+*F ---------------------------------------------------------------------------*/
 void LCD_WriteSingle(char text, int position){
     position = posLookUp[position-1];
     showChar(text, position);
-
 }

@@ -271,6 +271,12 @@ int main(void)
     TA0CCR0 = 10000;  
     TA0CTL |= TASSEL__SMCLK | MC__CONTINUOUS; // ACLK, Up mode
 
+    TA1CTL = TASSEL__ACLK | MC__UP | TACLR; // ACLK, Up mode, clear timer
+    TA1CCR0 = 32768 - 1;                   // Set Timer A1 period (1 second)
+    TA1CCTL0 = CCIE;                       // Enable interrupt for CCR0
+
+
+
     LCD_INIT();
     LCD_WriteAll('S','T','P','W','C','H'); // initialisation visual indicator
     __delay_cycles(400000);
@@ -301,7 +307,7 @@ __interrupt void Port_1 (void)
 {
     __disable_interrupt();
     __delay_cycles(40000);
-
+    setTimeSwitch();//For Time.c
     if (!(P1IN & BIT2)) { // Check again if switch is still pressed
             // Save first process details...
       P1OUT ^= 0x01;                 // Set P1.0 toggle (Green LED)
@@ -343,11 +349,29 @@ __interrupt void Port_1 (void)
 }
 
 
+/*F ----------------------------------------------------------------------------
+  NAME :      Port_2()
+
+  DESCRIPTION :
+              ISR for a value change on the port two register
+
+  INPUTS :    void
+
+  RETURNS :   void
+
+  PROCESS :
+              [1]   Disable interrupts
+              [2]   Wait for 100ms to prevent double presses
+              [3]   Toggle an LED
+              [4]   Set a flag
+              [5]   Reset the interrupt and enables interrupts
+*F ---------------------------------------------------------------------------*/
+
 #pragma vector=PORT2_VECTOR
 __interrupt void Port_2 (void)
 {
     __disable_interrupt();
-    __delay_cycles(40000);
+    __delay_cycles(100000);
     P4OUT |= 0x01;                 // Set P4.0 (Green LED)
     STARTSTOP_PRESSED = 1;
     P2IFG &= ~BIT6; // Clear local interrupt flag for P2.6
@@ -362,4 +386,22 @@ __interrupt void Timer_A (void)
   P1OUT ^= BIT0;
 	TA0CCR0 += 10000; 
   globalTimer++;
+}
+/*F ----------------------------------------------------------------------------
+  NAME :      Timer_A1()
+
+  DESCRIPTION :
+              ISR for timer A1 interrupt, runs every 1 second
+
+  INPUTS :    void
+
+  RETURNS :   void
+
+  PROCESS :
+              [1]   Increment time storage in memory
+*F ---------------------------------------------------------------------------*/
+#pragma vector=TIMER1_A0_VECTOR
+__interrupt void Timer_A1_ISR (void)    
+{
+  clkIncrement();
 }

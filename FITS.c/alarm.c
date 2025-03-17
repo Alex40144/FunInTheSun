@@ -4,6 +4,16 @@
 
 int currentAlarmHoursMins[] = {12,0};
 
+int Alarm_getAlarmHours()
+{
+    return currentAlarmHoursMins[0];
+}
+
+int Alarm_getAlarmMins()
+{
+    return currentAlarmHoursMins[1];
+}
+
 void setLCDAlarmHours(){
     int hours = currentAlarmHoursMins[0];
     int hourDigitOne = hours / 10;

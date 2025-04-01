@@ -115,7 +115,7 @@ void toggleChime() {
 }
 
 // Clock Mode State Machine
-void clockMode() {
+void clock() {
     initButtons();
     currentState = CLOCK_MODE;  // Default state
     displayClockTime();  // Show time on startup
@@ -123,9 +123,9 @@ void clockMode() {
     while (1) {
         if (!(P1IN & MODE_BUTTON)) {  // Enter Time Setting Mode
             delay_ms(50);
-            while (!(P1IN & MODE_BUTTON));
-            delay_ms(50);
-            setClockMode();
+            // while (!(P1IN & MODE_BUTTON));
+            // delay_ms(50);
+            // setClockMode();
         }
 
         if (!(P1IN & START_STOP)) {  // Show Month/Date

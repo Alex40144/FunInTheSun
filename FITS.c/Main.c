@@ -279,7 +279,7 @@ int main(void)
 
     LCD_INIT();
     LCD_WriteAll('S','T','P','W','C','H'); // initialisation visual indicator
-    __delay_cycles(400000);
+    __delay_cycles(400);
 
     _BIS_SR(GIE);                   // interrupts enabled
 

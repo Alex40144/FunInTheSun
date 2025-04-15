@@ -1,5 +1,7 @@
 void LCD_setAlarm();
 void LCD_clearAlarm();
+void LCD_setTxRx();
+void LCD_clearTxRx();
 void LCD_setStopWatch();
 void LCD_clearStopWatch();
 void LCD_setChrono();

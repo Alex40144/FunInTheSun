@@ -218,6 +218,41 @@ const char alphabetSmall[26][2] =
  }
 
 /*F ----------------------------------------------------------------------------
+  NAME :      LCD_setTxRx()
+
+  DESCRIPTION :
+                Enables the TxRx icon on the LCD
+
+  INPUTS :      void
+
+  RETURNS :     void
+
+  PROCESS :
+                [1]     Set the LCD to display a "1" in the location of the TxRx icon so it enables
+*F ---------------------------------------------------------------------------*/
+ void LCD_setTxRx(){
+    LCDMEMW[9] |= 0x0500;//The TX RX symbol
+    LCDBMEMW[9] |= 0x0500;
+ }
+
+/*F ----------------------------------------------------------------------------
+  NAME :      LCD_clearTxRx()
+
+  DESCRIPTION :
+                Disables the TxRx icon on the LCD
+
+  INPUTS :      void
+
+  RETURNS :     void
+
+  PROCESS :
+                [1]     Set the LCD to display a "0" in the location of the TxRx icon so it disables
+*F ---------------------------------------------------------------------------*/
+  void LCD_clearTxRx(){
+    LCDMEMW[9] &= ~0x0500;
+    LCDBMEMW[9] &= ~0x0500;
+ }
+/*F ----------------------------------------------------------------------------
   NAME :      LCD_setStopWatch()
 
   DESCRIPTION :

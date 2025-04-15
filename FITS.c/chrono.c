@@ -21,6 +21,8 @@ void chrono () {
     int lappedTime = 0;
     int lastResetButtonState = 0;
     
+    clearSTARTSTOP();
+
     //when start is pressed, 
 
     while (1){

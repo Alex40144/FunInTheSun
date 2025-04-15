@@ -308,7 +308,7 @@ __interrupt void Port_1 (void)
     __disable_interrupt();
     __delay_cycles(40000);
     setTimeSwitch();//For Time.c
-    if (!(P1IN & BIT2)) { // Check again if switch is still pressed
+    if (!(P1IN & BIT2) && (P1IN & BIT4)) { // Check again if switch is still pressed and lap/reset is not pressed
             // Save first process details...
       P1OUT ^= 0x01;                 // Set P1.0 toggle (Green LED)
 
